@@ -1,0 +1,1223 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>冷风直播 — 观众</title>
+
+  <!-- TCPlayerLite v4 + TXLivePlayer（支持 WebRTC 拉流，无需 License） -->
+  <link href="https://web.sdk.qcloud.com/player/tcplayer/release/v4.9.1/tcplayer.min.css" rel="stylesheet"/>
+  <script src="https://web.sdk.qcloud.com/player/tcplayer/release/v4.9.1/libs/TXLivePlayer-1.2.0.min.js"></script>
+  <script src="https://web.sdk.qcloud.com/player/tcplayer/release/v4.9.1/libs/hls.min.0.13.2m.js"></script>
+  <script src="https://web.sdk.qcloud.com/player/tcplayer/release/v4.9.1/libs/flv.min.1.5.js"></script>
+  <script src="https://web.sdk.qcloud.com/player/tcplayer/release/v4.9.1/tcplayer.v4.9.1.min.js"></script>
+
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+    html, body {
+      width: 100%; height: 100%;
+      background: #000;
+      font-family: -apple-system, 'PingFang SC', sans-serif;
+      overflow: hidden;
+    }
+
+    /* ── 全屏容器 ── */
+    .live-wrap {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    /* ── 播放器全屏 ── */
+    #player-wrap {
+      position: absolute;
+      inset: 0;
+      background: #111;
+      z-index: 0;
+    }
+    #player-container {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      display: block;
+      background: #000;
+    }
+
+    /* ── 顶部区域 ── */
+    .top-bar {
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      padding: 44px 12px 0;
+      background: linear-gradient(to bottom, rgba(0,0,0,.6) 0%, transparent 100%);
+      z-index: 10;
+    }
+    .top-row1 {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    /* 返回箭头 */
+    .back-btn {
+      width: 18px; height: 18px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; flex-shrink: 0;
+      color: #fff; font-size: 18px;
+    }
+    /* 主播信息胶囊 */
+    .anchor-capsule {
+      display: flex; align-items: center;
+      background: rgba(0,0,0,.3);
+      border-radius: 27px;
+      padding: 3px 16px 3px 3px;
+      gap: 8px;
+      flex: 1;
+      min-width: 0;
+    }
+    .anchor-avatar {
+      width: 43px; height: 43px;
+      border-radius: 50%;
+      border: 1.5px solid #fff;
+      background: url(https://lanhu-dds-backend.oss-cn-beijing.aliyuncs.com/merge_image/imgs/e3a2fdc6b43847498e11b3d577403570_mergeImage.png) center/cover;
+      flex-shrink: 0;
+    }
+    .anchor-info { min-width: 0; }
+    .anchor-name {
+      color: #fff; font-size: 15px; font-weight: 600;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .anchor-viewers { color: rgba(255,255,255,.85); font-size: 12px; margin-top: 1px; }
+    /* 关注+分享按钮 */
+    .top-actions {
+      display: flex; align-items: center; gap: 6px; flex-shrink: 0;
+    }
+    .follow-btn {
+      height: 30px; padding: 0 12px;
+      border-radius: 15px; border: none;
+      background: linear-gradient(90deg, #ff6034, #ee0a24);
+      color: #fff; font-size: 12px; font-weight: 600;
+      cursor: pointer; white-space: nowrap;
+    }
+    .follow-btn.followed { background: rgba(255,255,255,.25); }
+    .share-area {
+      display: flex; align-items: center;
+      background: rgba(0,0,0,.3); border-radius: 4px;
+      padding: 4px 8px; gap: 4px; cursor: pointer;
+    }
+    .share-icon { font-size: 14px; }
+    .share-text { color: #fff; font-size: 12px; }
+
+    /* 第二行：投诉 + 已看时长 */
+    .top-row2 {
+      display: flex; align-items: flex-start;
+      justify-content: space-between;
+      margin-top: 8px; padding-bottom: 8px;
+    }
+    .complain-btn {
+      display: flex; align-items: center; gap: 4px;
+      background: rgba(0,0,0,.3); border-radius: 27px;
+      padding: 3px 10px; cursor: pointer;
+      color: #fff; font-size: 13px;
+    }
+    .watched-badge {
+      background: url(https://lanhu-oss-proxy.lanhuapp.com/SketchPngf841d722deb5301be6327aa710d118914b957728602781023a4ae417bedc561f) 0 -1px/85px 79px no-repeat;
+      padding: 7px 5px 3px 6px;
+      text-align: center;
+    }
+    .watched-label { color: #fff; font-size: 13px; font-weight: 500; }
+    .watched-time  { color: #fff; font-size: 13px; font-weight: 500; margin: -2px 0; }
+    .watched-score { color: #803e0a; font-size: 11px; font-weight: 500; }
+
+    /* ── 右侧功能按钮（签到/领取/倒计时）── */
+    .right-actions {
+      position: absolute;
+      top: 170px; right: 14px;
+      display: flex; flex-direction: column; gap: 12px;
+      z-index: 10;
+    }
+    .right-action-item {
+      display: flex; flex-direction: column;
+      align-items: center; gap: 0;
+      cursor: pointer;
+    }
+    .right-action-img {
+      width: 60px; height: 60px;
+      border-radius: 8px;
+      object-fit: cover;
+      background: rgba(0,0,0,.4);
+    }
+    .right-action-time {
+      background: rgba(0,0,0,.56);
+      border-radius: 0 0 8px 8px;
+      width: 60px; text-align: center;
+      color: #fff; font-size: 11px;
+      padding: 2px 0;
+    }
+    .right-action-label {
+      color: #fff; font-size: 12px; margin-top: 2px;
+    }
+
+    /* ── 弹幕 + 商品卡片区 ── */
+    .bottom-content {
+      position: absolute;
+      left: 0; right: 0;
+      bottom: 72px;
+      z-index: 10;
+      padding: 0 12px;
+      display: flex;
+      align-items: flex-end;
+      gap: 10px;
+    }
+
+    /* 弹幕列 */
+    .danmu-col {
+      flex: 1; min-width: 0;
+      display: flex; flex-direction: column;
+      gap: 6px; overflow: hidden;
+    }
+    .danmu-item {
+      display: inline-flex; align-items: center; gap: 5px;
+      background: rgba(0,0,0,.3);
+      border-radius: 16px;
+      padding: 4px 12px 4px 4px;
+      width: fit-content; max-width: 100%;
+    }
+    .danmu-avatar {
+      width: 28px; height: 28px; border-radius: 50%;
+      border: 1px solid rgba(151,151,151,1);
+      background: rgba(100,100,100,.5);
+      flex-shrink: 0;
+      font-size: 14px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .danmu-name { color: #4ff9fc; font-size: 13px; font-weight: 500; }
+    .danmu-text { color: #fff; font-size: 13px; }
+
+    /* 商品卡片 */
+    .goods-card {
+      width: 148px; flex-shrink: 0;
+      background: #fff;
+      border-radius: 6px;
+      overflow: hidden;
+      border: 1px solid #fff;
+      position: relative;
+      cursor: pointer;
+    }
+    .goods-img-wrap {
+      width: 148px; height: 119px;
+      background: url(https://lanhu-dds-backend.oss-cn-beijing.aliyuncs.com/merge_image/imgs/12e04eba201b49a8a001101c3cd35787_mergeImage.png) center/cover;
+      position: relative;
+    }
+    .goods-tag {
+      position: absolute; bottom: 0; left: 0; right: 0;
+      background: rgba(0,0,0,.5);
+      padding: 2px 0;
+      display: flex; align-items: center; justify-content: center; gap: 4px;
+    }
+    .goods-tag-icon { font-size: 14px; }
+    .goods-tag-text { color: #fff; font-size: 13px; font-weight: 600; }
+    .goods-name {
+      color: #333; font-size: 13px; font-weight: 500;
+      padding: 3px 4px 0;
+      line-height: 1.4;
+      display: -webkit-box; -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical; overflow: hidden;
+    }
+    .goods-bottom {
+      display: flex; align-items: center;
+      justify-content: space-between;
+      padding: 4px 4px 4px;
+    }
+    .goods-price {
+      color: #fff; font-weight: 700;
+      font-family: Arial Black, sans-serif;
+    }
+    .goods-price .unit { font-size: 12px; }
+    .goods-price .integer { font-size: 22px; line-height: 1; }
+    .goods-price .decimal { font-size: 14px; }
+    .goods-buy-btn {
+      background: url(https://lanhu-oss-proxy.lanhuapp.com/SketchPng9b4d04b7983d96028065f3251cfcb40e984d2bda0446e843b651302bcfe282c1) center/cover;
+      width: 38px; height: 28px;
+      display: flex; align-items: center; justify-content: center;
+      color: #fff; font-size: 14px; font-weight: 700;
+      cursor: pointer;
+    }
+    .goods-price-wrap {
+      background: url(https://lanhu-oss-proxy.lanhuapp.com/SketchPngc11643f4b35c372bf175b72748141be48139741d60de301f83a40a8c97690226) center/cover;
+      background-size: 100% 100%;
+      padding: 3px 4px;
+      display: flex; align-items: baseline; gap: 1px;
+    }
+
+    /* ── 底部输入栏 ── */
+    .bottom-bar {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      padding: 10px 12px calc(10px + env(safe-area-inset-bottom, 0px));
+      z-index: 10;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .like-btn-wrap {
+      width: 46px; height: 46px;
+      background: rgba(0,0,0,.3); border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; flex-shrink: 0;
+    }
+    .like-btn-wrap img, .like-btn-wrap span { font-size: 24px; }
+    .input-box {
+      flex: 1;
+      background: rgba(0,0,0,.3); border-radius: 22px;
+      padding: 10px 14px;
+      display: flex; align-items: center; justify-content: space-between;
+      cursor: pointer;
+    }
+    .input-placeholder { color: #fff; font-size: 14px; font-weight: 500; }
+    .input-emoji { font-size: 22px; }
+    .cart-btn {
+      width: 46px; height: 46px;
+      background: rgba(0,0,0,.3); border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; flex-shrink: 0; font-size: 24px;
+    }
+
+    /* ── 飘心动画 ── */
+    @keyframes floatHeart {
+      0%   { transform: translateY(0) scale(1); opacity: 1; }
+      100% { transform: translateY(-250px) scale(1.8); opacity: 0; }
+    }
+    .float-heart {
+      position: fixed; font-size: 28px;
+      pointer-events: none;
+      animation: floatHeart 1.6s ease-out forwards;
+      z-index: 99;
+    }
+
+    /* ── 设置抽屉 ── */
+    .drawer-mask {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,.5);
+      display: none; z-index: 50;
+    }
+    .drawer-mask.show { display: block; }
+    .drawer {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      background: #1a1a1a;
+      border-radius: 20px 20px 0 0;
+      padding: 12px 16px calc(24px + env(safe-area-inset-bottom, 0px));
+      transform: translateY(100%);
+      transition: transform .3s cubic-bezier(.4,0,.2,1);
+      z-index: 51;
+    }
+    .drawer.show { transform: translateY(0); }
+    .drawer-handle { width: 36px; height: 4px; background: #444; border-radius: 2px; margin: 0 auto 16px; }
+    .drawer-title { font-size: 16px; font-weight: 700; color: #fff; margin-bottom: 16px; }
+    .drawer-field { margin-bottom: 14px; }
+    .drawer-field label { display: block; font-size: 11px; color: #888; margin-bottom: 6px; text-transform: uppercase; }
+    .drawer-field input {
+      width: 100%; background: #1e1e1e; border: 1px solid #2a2a2a;
+      border-radius: 10px; padding: 11px 13px;
+      color: #f0f0f0; font-size: 14px; outline: none;
+    }
+    .drawer-field input:focus { border-color: #ee0a24; }
+    .drawer-field .hint { font-size: 11px; color: #555; margin-top: 5px; line-height: 1.5; }
+    .drawer-btns { display: flex; gap: 10px; margin-top: 4px; }
+    .btn {
+      flex: 1; height: 48px; border: none; border-radius: 12px;
+      font-size: 15px; font-weight: 700; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .btn-primary { background: linear-gradient(90deg,#ff6034,#ee0a24); color: #fff; }
+    .btn-secondary { background: #1e1e1e; color: #f0f0f0; border: 1px solid #2a2a2a; }
+    .log-box {
+      background: #0d0d0d; border: 1px solid #2a2a2a; border-radius: 10px;
+      padding: 10px 12px; font-size: 11px; font-family: monospace;
+      max-height: 110px; overflow-y: auto; line-height: 1.8; margin-top: 10px;
+    }
+    .log-box .ok   { color: #4caf50; }
+    .log-box .err  { color: #f44336; }
+    .log-box .info { color: #42a5f5; }
+    .log-box .warn { color: #ffa726; }
+
+    /* ── 商品面板 ── */
+    .goods-panel-mask {
+      position: fixed; inset: 0; background: rgba(0,0,0,.5);
+      z-index: 60; display: none;
+    }
+    .goods-panel-mask.show { display: block; }
+    .goods-panel {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      height: 75vh;
+      background: #fff;
+      border-radius: 20px 20px 0 0;
+      display: flex; flex-direction: column;
+      transform: translateY(100%);
+      transition: transform .3s cubic-bezier(.4,0,.2,1);
+      z-index: 61;
+    }
+    .goods-panel.show { transform: translateY(0); }
+    .goods-panel-handle {
+      width: 36px; height: 4px; background: #ddd;
+      border-radius: 2px; margin: 12px auto 0;
+      flex-shrink: 0;
+    }
+    .goods-panel-header {
+      padding: 12px 16px 0;
+      flex-shrink: 0;
+    }
+    .goods-search-bar {
+      display: flex; align-items: center; gap: 10px;
+      background: #f5f5f5; border-radius: 20px;
+      padding: 8px 14px; margin-bottom: 12px;
+    }
+    .goods-search-bar input {
+      flex: 1; border: none; background: transparent;
+      font-size: 13px; color: #333; outline: none;
+    }
+    .goods-search-bar input::placeholder { color: #999; }
+    .goods-search-actions {
+      display: flex; gap: 16px;
+    }
+    .goods-action-btn {
+      display: flex; flex-direction: column; align-items: center;
+      gap: 2px; font-size: 11px; color: #555;
+    }
+    .goods-action-btn .icon {
+      width: 28px; height: 28px; background: #f5f5f5;
+      border-radius: 6px; display: flex; align-items: center;
+      justify-content: center; font-size: 16px;
+    }
+    .goods-tabs {
+      display: flex; gap: 0; padding: 0 16px;
+      border-bottom: 1px solid #f0f0f0; margin-bottom: 0;
+      flex-shrink: 0;
+    }
+    .goods-tab {
+      padding: 8px 16px 10px; font-size: 14px; color: #666;
+      cursor: pointer; position: relative; white-space: nowrap;
+    }
+    .goods-tab.active {
+      color: #ee0a24; font-weight: 700;
+    }
+    .goods-tab.active::after {
+      content: ''; position: absolute; bottom: 0; left: 50%;
+      transform: translateX(-50%); width: 24px; height: 3px;
+      background: #ee0a24; border-radius: 2px;
+    }
+    .goods-list {
+      flex: 1; overflow-y: auto; padding: 0 16px;
+      padding-bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+    }
+    .goods-list-item {
+      display: flex; align-items: center; gap: 12px;
+      padding: 14px 0; border-bottom: 1px solid #f5f5f5;
+    }
+    .goods-list-item:last-child { border-bottom: none; }
+    .goods-list-rank {
+      width: 20px; text-align: center; font-size: 13px;
+      font-weight: 700; color: #999; flex-shrink: 0;
+    }
+    .goods-list-rank.top1 { color: #ee0a24; }
+    .goods-list-rank.top2 { color: #ff6034; }
+    .goods-list-rank.top3 { color: #ff9f40; }
+    .goods-list-thumb {
+      width: 72px; height: 72px; border-radius: 8px;
+      object-fit: cover; flex-shrink: 0; background: #f0f0f0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 28px; overflow: hidden;
+    }
+    .goods-list-thumb img { width: 100%; height: 100%; object-fit: cover; }
+    .goods-list-info { flex: 1; min-width: 0; }
+    .goods-list-name {
+      font-size: 14px; color: #222; font-weight: 500;
+      overflow: hidden; text-overflow: ellipsis;
+      display: -webkit-box; -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical; line-height: 1.4;
+    }
+    .goods-list-tag {
+      font-size: 11px; color: #999; margin-top: 4px;
+    }
+    .goods-list-tag .on-air {
+      color: #ee0a24; font-weight: 600; margin-right: 4px;
+    }
+    .goods-list-bottom {
+      display: flex; align-items: center;
+      justify-content: space-between; margin-top: 8px;
+    }
+    .goods-list-price {
+      font-size: 18px; font-weight: 700; color: #ee0a24;
+    }
+    .goods-list-price .unit { font-size: 12px; }
+    .goods-list-price .sold { font-size: 11px; color: #999; margin-left: 4px; font-weight: 400; }
+    .goods-buy-action {
+      display: flex; align-items: center; gap: 8px;
+    }
+    .goods-cart-icon {
+      width: 28px; height: 28px; display: flex; align-items: center;
+      justify-content: center; font-size: 18px; color: #ee0a24;
+    }
+    .goods-grab-btn {
+      background: linear-gradient(90deg,#ff6034,#ee0a24);
+      color: #fff; border: none; border-radius: 20px;
+      padding: 7px 16px; font-size: 13px; font-weight: 700;
+      cursor: pointer; white-space: nowrap;
+    }
+    .goods-grab-btn.sold-out {
+      background: #ddd; color: #999;
+    }
+    /* 抢购弹窗 */
+    .buy-modal-mask {
+      position: fixed; inset: 0; background: rgba(0,0,0,.6);
+      z-index: 80; display: none; align-items: flex-end;
+    }
+    .buy-modal-mask.show { display: flex; }
+    .buy-modal {
+      width: 100%; background: #fff;
+      border-radius: 20px 20px 0 0;
+      padding: 20px 16px calc(20px + env(safe-area-inset-bottom, 0px));
+    }
+    .buy-modal-header { display: flex; gap: 14px; margin-bottom: 20px; }
+    .buy-modal-thumb {
+      width: 80px; height: 80px; border-radius: 10px;
+      background: #f0f0f0; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center; font-size: 36px;
+    }
+    .buy-modal-meta { flex: 1; }
+    .buy-modal-price {
+      font-size: 24px; font-weight: 700; color: #ee0a24;
+    }
+    .buy-modal-price .unit { font-size: 14px; }
+    .buy-modal-name { font-size: 13px; color: #555; margin-top: 6px; line-height: 1.5; }
+    .buy-modal-close {
+      position: absolute; right: 16px; top: 20px;
+      font-size: 22px; color: #999; cursor: pointer;
+    }
+    .buy-modal-section { margin-bottom: 16px; }
+    .buy-modal-label { font-size: 13px; color: #333; font-weight: 600; margin-bottom: 10px; }
+    .buy-modal-specs { display: flex; flex-wrap: wrap; gap: 8px; }
+    .spec-tag {
+      padding: 6px 14px; border: 1px solid #ddd;
+      border-radius: 20px; font-size: 13px; color: #333; cursor: pointer;
+    }
+    .spec-tag.active { border-color: #ee0a24; color: #ee0a24; background: #fff5f5; }
+    .qty-row { display: flex; align-items: center; gap: 12px; }
+    .qty-btn {
+      width: 30px; height: 30px; border-radius: 50%;
+      border: 1px solid #ddd; background: #fff;
+      font-size: 18px; cursor: pointer; display: flex;
+      align-items: center; justify-content: center; color: #333;
+    }
+    .qty-num { font-size: 16px; font-weight: 700; min-width: 24px; text-align: center; }
+    .buy-confirm-btn {
+      width: 100%; height: 48px; background: linear-gradient(90deg,#ff6034,#ee0a24);
+      color: #fff; border: none; border-radius: 24px;
+      font-size: 16px; font-weight: 700; cursor: pointer; margin-top: 8px;
+    }
+
+    /* ── 福袋入口按钮（右侧悬浮，在领取/签到下方） ── */
+    .lucky-bag-btn {
+      position: relative; cursor: pointer;
+      display: flex; flex-direction: column; align-items: center; gap: 2px;
+    }
+    .lucky-bag-icon {
+      width: 48px; height: 48px; border-radius: 50%;
+      background: linear-gradient(135deg,#ff9f40,#ee0a24);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 24px; box-shadow: 0 2px 8px rgba(238,10,36,.4);
+      animation: bagPulse 2s infinite;
+    }
+    @keyframes bagPulse {
+      0%,100% { transform: scale(1); }
+      50% { transform: scale(1.08); }
+    }
+    .lucky-bag-countdown {
+      font-size: 11px; color: #fff;
+      background: rgba(0,0,0,.45); border-radius: 8px;
+      padding: 1px 5px; text-align: center;
+    }
+    .lucky-bag-label { font-size: 11px; color: #fff; text-shadow: 0 1px 3px rgba(0,0,0,.6); }
+
+    /* ── 福袋弹窗通用遮罩 ── */
+    .lb-mask {
+      position: fixed; inset: 0; background: rgba(0,0,0,.6);
+      z-index: 70; display: none; align-items: center; justify-content: center;
+    }
+    .lb-mask.show { display: flex; }
+
+    /* ── 福袋详情弹窗 ── */
+    .lb-detail {
+      width: 300px; background: #fff; border-radius: 20px;
+      overflow: hidden; position: relative;
+    }
+    .lb-detail-cover {
+      width: 100%; height: 150px; object-fit: cover;
+      background: linear-gradient(135deg,#ff9f40,#ee0a24);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 60px;
+    }
+    .lb-detail-body { padding: 16px; }
+    .lb-detail-title { font-size: 17px; font-weight: 700; color: #222; margin-bottom: 4px; }
+    .lb-detail-sub { font-size: 12px; color: #999; margin-bottom: 14px; }
+    .lb-detail-prizes {
+      display: flex; gap: 8px; margin-bottom: 16px;
+    }
+    .lb-prize-item {
+      flex: 1; background: #fff9f0; border-radius: 10px;
+      padding: 8px 6px; text-align: center;
+    }
+    .lb-prize-item .p-emoji { font-size: 22px; }
+    .lb-prize-item .p-name { font-size: 11px; color: #333; margin-top: 4px; line-height: 1.3; }
+    .lb-detail-timer {
+      text-align: center; font-size: 12px; color: #999; margin-bottom: 14px;
+    }
+    .lb-detail-timer span { color: #ee0a24; font-weight: 700; }
+    .lb-join-btn {
+      width: 100%; height: 44px; background: linear-gradient(90deg,#ff6034,#ee0a24);
+      color: #fff; border: none; border-radius: 22px;
+      font-size: 15px; font-weight: 700; cursor: pointer;
+    }
+    .lb-join-btn.joined { background: #ddd; color: #999; }
+    .lb-detail-close {
+      position: absolute; top: 10px; right: 12px;
+      font-size: 22px; color: rgba(255,255,255,.8); cursor: pointer; z-index: 1;
+    }
+    .lb-detail-agree {
+      font-size: 11px; color: #999; text-align: center; margin-top: 10px;
+    }
+    .lb-detail-agree a { color: #ee0a24; }
+
+    /* ── 抽奖结果弹窗 ── */
+    .lb-result {
+      width: 280px; border-radius: 20px; overflow: visible;
+      position: relative; text-align: center;
+    }
+    .lb-result-card {
+      background: #fff; border-radius: 20px; padding: 30px 20px 24px;
+    }
+    .lb-result-icon { font-size: 64px; margin-bottom: 12px; line-height: 1; }
+    .lb-result-title { font-size: 20px; font-weight: 700; color: #222; margin-bottom: 6px; }
+    .lb-result-sub { font-size: 13px; color: #666; line-height: 1.6; margin-bottom: 20px; }
+    /* 奖品卡片（代金券/积分等） */
+    .lb-prize-card {
+      background: linear-gradient(135deg,#fff4e0,#ffe0b2);
+      border-radius: 14px; padding: 14px 16px;
+      display: flex; align-items: center; gap: 14px;
+      margin-bottom: 20px; text-align: left;
+    }
+    .lb-prize-card .prize-icon { font-size: 36px; flex-shrink: 0; }
+    .lb-prize-card .prize-info .prize-title { font-size: 15px; font-weight: 700; color: #c94400; }
+    .lb-prize-card .prize-info .prize-expire { font-size: 11px; color: #999; margin-top: 2px; }
+    .lb-result-primary-btn {
+      width: 100%; height: 44px; background: linear-gradient(90deg,#ff6034,#ee0a24);
+      color: #fff; border: none; border-radius: 22px;
+      font-size: 15px; font-weight: 700; cursor: pointer; margin-bottom: 10px;
+    }
+    .lb-result-secondary-btn {
+      width: 100%; height: 38px; background: transparent;
+      color: #999; border: none; font-size: 13px; cursor: pointer;
+    }
+    .lb-result-agree {
+      font-size: 11px; color: #bbb; margin-top: 8px;
+    }
+    .lb-result-agree a { color: #ee0a24; }
+    /* 没中奖特殊样式 */
+    .lb-result-card.no-win { background: linear-gradient(160deg,#fff8f0,#fff); }
+    /* 关闭按钮 */
+    .lb-result-close-wrap {
+      margin-top: 16px;
+    }
+    .lb-result-close-circle {
+      width: 36px; height: 36px; border-radius: 50%;
+      border: 2px solid rgba(255,255,255,.6);
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto; cursor: pointer; color: #fff; font-size: 18px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="live-wrap">
+
+  <!-- 播放器全屏背景 -->
+  <div id="player-wrap">
+    <video id="player-container" preload="auto" playsinline webkit-playsinline></video>
+  </div>
+
+  <!-- 顶部信息栏 -->
+  <div class="top-bar">
+    <div class="top-row1">
+      <div class="back-btn">‹</div>
+      <div class="anchor-capsule">
+        <div class="anchor-avatar"></div>
+        <div class="anchor-info">
+          <div class="anchor-name">冷丰特选</div>
+          <div class="anchor-viewers"><span id="viewer-count">117</span>人正在观看</div>
+        </div>
+      </div>
+      <div class="top-actions">
+        <button class="follow-btn" id="follow-btn" onclick="toggleFollow()">+ 关注</button>
+        <div class="share-area" onclick="showDrawer()">
+          <span class="share-icon">⚙️</span>
+          <span class="share-text">设置</span>
+        </div>
+      </div>
+    </div>
+    <div class="top-row2">
+      <div class="complain-btn">
+        <span>📢</span><span>投诉</span>
+      </div>
+      <div class="watched-badge">
+        <div class="watched-label">已看</div>
+        <div class="watched-time" id="watch-time">00:00</div>
+        <div class="watched-score">得100积分</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 右侧活动按钮 -->
+  <div class="right-actions">
+    <div class="right-action-item">
+      <div class="right-action-img" style="background:url(https://lanhu-dds-backend.oss-cn-beijing.aliyuncs.com/merge_image/imgs/1488c0bca514499a8d655ff076cc68dc_mergeImage.png) center/cover"></div>
+      <div class="right-action-time" id="timer1">05:45</div>
+      <div class="right-action-label">去领取</div>
+    </div>
+    <div class="right-action-item">
+      <div class="right-action-img" style="background:url(https://lanhu-dds-backend.oss-cn-beijing.aliyuncs.com/merge_image/imgs/87cbf0649f3543f9aa2173b35af1e55a_mergeImage.png) center/cover"></div>
+      <div class="right-action-time" id="timer2">05:45</div>
+      <div class="right-action-label">去签到</div>
+    </div>
+    <!-- 福袋入口 -->
+    <div class="right-action-item lucky-bag-btn" onclick="showLuckyBagDetail()">
+      <div class="lucky-bag-icon">🎁</div>
+      <div class="lucky-bag-countdown" id="lucky-bag-timer">04:07</div>
+      <div class="lucky-bag-label">抽福袋</div>
+    </div>
+  </div>
+
+  <!-- 弹幕 + 商品卡片 -->
+  <div class="bottom-content">
+    <div class="danmu-col" id="danmu-area">
+      <div class="danmu-item">
+        <div class="danmu-avatar">😊</div>
+        <span class="danmu-name">宁静致远：</span><span class="danmu-text">111</span>
+      </div>
+      <div class="danmu-item">
+        <div class="danmu-avatar">😄</div>
+        <span class="danmu-name">心平气和：</span><span class="danmu-text">111</span>
+      </div>
+      <div class="danmu-item">
+        <div class="danmu-avatar">🙂</div>
+        <span class="danmu-name">宁静致远：</span><span class="danmu-text">主播这个商品有没有运费险，坏果退换吗</span>
+      </div>
+      <div class="danmu-item">
+        <div class="danmu-avatar">😁</div>
+        <span class="danmu-name">宁静致远：</span><span class="danmu-text">来了</span>
+      </div>
+    </div>
+    <div class="goods-card" onclick="showDrawer()">
+      <div class="goods-img-wrap">
+        <div class="goods-tag">
+          <span class="goods-tag-icon">📊</span>
+          <span class="goods-tag-text">讲解中</span>
+        </div>
+      </div>
+      <div class="goods-name">冷丰优选3J智利车厘子 鲜…</div>
+      <div class="goods-bottom">
+        <div class="goods-price-wrap">
+          <span class="goods-price" style="color:#fff">
+            <span class="unit">¥</span>
+            <span class="integer">128</span>
+            <span class="decimal">.8</span>
+          </span>
+        </div>
+        <div class="goods-buy-btn" onclick="showBuyModal({emoji:'🍒',price:'128.8',name:'冷丰优选3J智利车厘子'})">抢</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 底部输入栏 -->
+  <div class="bottom-bar">
+    <div class="like-btn-wrap" onclick="sendLike()">
+      <span>👍</span>
+    </div>
+    <div class="input-box" onclick="showDrawer()">
+      <span class="input-placeholder">说点什么…</span>
+      <span class="input-emoji">😊</span>
+    </div>
+    <div class="cart-btn" onclick="showGoodsPanel()">🛒</div>
+  </div>
+
+  <!-- 商品面板 -->
+  <div class="goods-panel-mask" id="goods-panel-mask" onclick="hideGoodsPanel()"></div>
+  <div class="goods-panel" id="goods-panel">
+    <div class="goods-panel-handle"></div>
+    <div class="goods-panel-header">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+        <span style="font-size:16px;font-weight:700;color:#222;">商品</span>
+        <span style="font-size:22px;color:#999;cursor:pointer;" onclick="hideGoodsPanel()">×</span>
+      </div>
+      <div class="goods-search-bar">
+        <span style="font-size:15px;color:#999;">🔍</span>
+        <input type="text" placeholder="输入商品关键字" id="goods-search" oninput="filterGoods()" />
+      </div>
+      <div class="goods-search-actions" style="display:flex;justify-content:flex-end;gap:20px;margin-bottom:12px;">
+        <div class="goods-action-btn">
+          <div class="icon">🎫</div>
+          <span>优惠券</span>
+        </div>
+        <div class="goods-action-btn">
+          <div class="icon">📋</div>
+          <span>订单</span>
+        </div>
+      </div>
+    </div>
+    <div class="goods-tabs" id="goods-tabs">
+      <div class="goods-tab active" onclick="switchTab(this,'全部')">全部</div>
+      <div class="goods-tab" onclick="switchTab(this,'生鲜')">生鲜</div>
+      <div class="goods-tab" onclick="switchTab(this,'水果')">水果</div>
+      <div class="goods-tab" onclick="switchTab(this,'坚果')">坚果</div>
+    </div>
+    <div class="goods-list" id="goods-list"></div>
+  </div>
+
+  <!-- 抢购弹窗 -->
+  <div class="buy-modal-mask" id="buy-modal-mask" onclick="hideBuyModal(event)">
+    <div class="buy-modal" style="position:relative;">
+      <span class="buy-modal-close" onclick="hideBuyModal()">×</span>
+      <div class="buy-modal-header">
+        <div class="buy-modal-thumb" id="bm-thumb">🍒</div>
+        <div class="buy-modal-meta">
+          <div class="buy-modal-price"><span class="unit">¥</span><span id="bm-price">128.8</span></div>
+          <div class="buy-modal-name" id="bm-name">冷丰优选3J智利车厘子</div>
+        </div>
+      </div>
+      <div class="buy-modal-section">
+        <div class="buy-modal-label">规格</div>
+        <div class="buy-modal-specs">
+          <div class="spec-tag active" onclick="selectSpec(this)">5斤装</div>
+          <div class="spec-tag" onclick="selectSpec(this)">10斤装</div>
+          <div class="spec-tag" onclick="selectSpec(this)">礼盒装</div>
+        </div>
+      </div>
+      <div class="buy-modal-section">
+        <div class="buy-modal-label">数量</div>
+        <div class="qty-row">
+          <button class="qty-btn" onclick="changeQty(-1)">−</button>
+          <span class="qty-num" id="bm-qty">1</span>
+          <button class="qty-btn" onclick="changeQty(1)">+</button>
+        </div>
+      </div>
+      <button class="buy-confirm-btn" onclick="confirmBuy()">立即抢购</button>
+    </div>
+  </div>
+
+  <!-- 福袋详情弹窗 -->
+  <div class="lb-mask" id="lb-detail-mask" onclick="hideLbDetail(event)">
+    <div class="lb-detail" id="lb-detail-box">
+      <div class="lb-detail-cover">🎁</div>
+      <span class="lb-detail-close" onclick="hideLbDetailForce()">×</span>
+      <div class="lb-detail-body">
+        <div class="lb-detail-title">惊喜福袋</div>
+        <div class="lb-detail-sub">参与本场直播互动，即有机会抢到好礼</div>
+        <div class="lb-detail-prizes">
+          <div class="lb-prize-item"><div class="p-emoji">🥩</div><div class="p-name">精选金钱牛腱子肉 1份</div></div>
+          <div class="lb-prize-item"><div class="p-emoji">🎫</div><div class="p-name">平台通用代金券 ¥10</div></div>
+          <div class="lb-prize-item"><div class="p-emoji">🪙</div><div class="p-name">积分 100分</div></div>
+        </div>
+        <div class="lb-detail-timer">距开奖还剩 <span id="lb-detail-cd">04:07</span></div>
+        <button class="lb-join-btn" id="lb-join-btn" onclick="joinLuckyBag()">一键参与抽奖</button>
+        <div class="lb-detail-agree">参与即同意 <a href="#">《用户协议》</a></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 福袋结果弹窗 -->
+  <div class="lb-mask" id="lb-result-mask">
+    <div class="lb-result">
+      <div class="lb-result-card" id="lb-result-card">
+        <div class="lb-result-icon" id="lb-res-icon">🎉</div>
+        <div class="lb-result-title" id="lb-res-title">恭喜抽中福袋</div>
+        <div class="lb-result-sub" id="lb-res-sub">精选金钱牛腱子肉 1份</div>
+        <div class="lb-prize-card" id="lb-prize-card">
+          <div class="prize-icon" id="lb-prize-icon">🥩</div>
+          <div class="prize-info">
+            <div class="prize-title" id="lb-prize-title">精选金钱牛腱子肉</div>
+            <div class="prize-expire" id="lb-prize-expire">已读完并同意《用户协议》</div>
+          </div>
+        </div>
+        <button class="lb-result-primary-btn" id="lb-res-primary-btn" onclick="hideLbResult()">立即领取</button>
+        <button class="lb-result-secondary-btn" id="lb-res-secondary-btn" onclick="hideLbResult()">查看中奖名单</button>
+        <div class="lb-result-agree" id="lb-res-agree">已阅读并同意 <a href="#">《用户协议》</a></div>
+      </div>
+      <div class="lb-result-close-wrap">
+        <div class="lb-result-close-circle" onclick="hideLbResult()">×</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 设置抽屉 -->
+  <div class="drawer-mask" id="drawer-mask" onclick="hideDrawer()"></div>
+  <div class="drawer" id="drawer">
+    <div class="drawer-handle"></div>
+    <div class="drawer-title">播放设置</div>
+    <div class="drawer-field">
+      <label>播放地址</label>
+      <input id="pull-url" type="url" inputmode="url"
+        value="webrtc://newlive.lengfenghl.org.cn/live/leng"
+        placeholder="webrtc:// 或 http://xxx.m3u8" />
+      <div class="hint">HLS（.m3u8）和 WebRTC 均可，无需 License</div>
+    </div>
+    <div class="drawer-btns">
+      <button class="btn btn-primary" onclick="startPlay()">▶ 开始播放</button>
+      <button class="btn btn-secondary" onclick="stopPlay()">■ 停止</button>
+    </div>
+    <div class="log-box" id="pull-log">
+      <div class="info">填好播放地址后点「开始播放」</div>
+    </div>
+  </div>
+
+</div><!-- /live-wrap -->
+
+
+<script>
+// ── 日志 ─────────────────────────────────────
+function log(msg, type = 'info') {
+  const box = document.getElementById('pull-log');
+  const el = document.createElement('div');
+  el.className = type;
+  el.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`;
+  box.appendChild(el);
+  box.scrollTop = box.scrollHeight;
+}
+
+// ── 抽屉 ─────────────────────────────────────
+function showDrawer() {
+  document.getElementById('drawer-mask').classList.add('show');
+  document.getElementById('drawer').classList.add('show');
+}
+function hideDrawer() {
+  document.getElementById('drawer-mask').classList.remove('show');
+  document.getElementById('drawer').classList.remove('show');
+}
+
+// ── 关注 ─────────────────────────────────────
+let followed = false;
+function toggleFollow() {
+  followed = !followed;
+  const btn = document.getElementById('follow-btn');
+  btn.textContent = followed ? '✓ 已关注' : '+ 关注';
+  btn.classList.toggle('followed', followed);
+}
+
+// ── 观看时长计时 ──────────────────────────────
+let watchSeconds = 0;
+setInterval(() => {
+  watchSeconds++;
+  const m = String(Math.floor(watchSeconds / 60)).padStart(2, '0');
+  const s = String(watchSeconds % 60).padStart(2, '0');
+  document.getElementById('watch-time').textContent = `${m}:${s}`;
+}, 1000);
+
+// ── 倒计时 ────────────────────────────────────
+let t1 = 345, t2 = 345;
+setInterval(() => {
+  if (t1 > 0) t1--;
+  if (t2 > 0) t2--;
+  const fmt = t => `${String(Math.floor(t/60)).padStart(2,'0')}:${String(t%60).padStart(2,'0')}`;
+  document.getElementById('timer1').textContent = fmt(t1);
+  document.getElementById('timer2').textContent = fmt(t2);
+}, 1000);
+
+// ── 点赞飘心 ─────────────────────────────────
+function sendLike() {
+  const emojis = ['❤️','💕','💗','💖','🧡','💛'];
+  const heart = document.createElement('div');
+  heart.className = 'float-heart';
+  heart.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+  heart.style.left  = (30 + Math.random() * 60) + 'px';
+  heart.style.bottom = '80px';
+  document.body.appendChild(heart);
+  setTimeout(() => heart.remove(), 1600);
+}
+
+// ── 弹幕模拟 ─────────────────────────────────
+const avatars = ['😊','😄','🙂','😁','🥰','😎','😍'];
+const names   = ['宁静致远','心平气和','买买买','冰冰','大壮','晓晓','乐乐'];
+const msgs    = ['这个多少钱？','好看！','求链接！','已下单✅','主播加油！','哪里买？','好便宜！','有运费险吗？','坏果退吗？'];
+let danmuTimer = null;
+
+function addDanmu(avatar, name, msg) {
+  const area = document.getElementById('danmu-area');
+  const el = document.createElement('div');
+  el.className = 'danmu-item';
+  el.innerHTML = `<div class="danmu-avatar">${avatar}</div><span class="danmu-name">${name}：</span><span class="danmu-text">${msg}</span>`;
+  area.appendChild(el);
+  if (area.children.length > 6) area.removeChild(area.children[0]);
+  // 随机涨人数
+  const base = 100 + Math.floor(Math.random() * 30);
+  document.getElementById('viewer-count').textContent = base;
+}
+
+function startDanmu() {
+  danmuTimer = setInterval(() => {
+    const a = avatars[Math.floor(Math.random() * avatars.length)];
+    const n = names[Math.floor(Math.random() * names.length)];
+    const m = msgs[Math.floor(Math.random() * msgs.length)];
+    addDanmu(a, n, m);
+  }, 2500);
+}
+function stopDanmu() { clearInterval(danmuTimer); danmuTimer = null; }
+
+// ── 播放器 ───────────────────────────────────
+let player = null;
+
+function startPlay() {
+  const url = document.getElementById('pull-url').value.trim();
+  if (!url) { alert('请填写播放地址'); return; }
+
+  stopPlay();
+
+  // 重建 video 元素
+  const wrap = document.getElementById('player-wrap');
+  wrap.innerHTML = '<video id="player-container" preload="auto" playsinline webkit-playsinline style="width:100%;height:100%;object-fit:cover;display:block;background:#000;"></video>';
+
+  try {
+    log(`初始化播放器：${url}`, 'info');
+
+    player = TCPlayer('player-container', {
+      sources: [{ src: url }],
+      autoplay: true,
+      live: true,
+      width: '100%',
+      height: '100%',
+    });
+
+    player.on('playing', () => {
+      log('播放中 ✓', 'ok');
+      hideDrawer();
+      startDanmu();
+    });
+    player.on('waiting', () => log('缓冲中...', 'info'));
+    player.on('error', () => log('播放出错，检查地址或主播是否在线', 'err'));
+    player.on('ended', () => { log('直播已结束', 'warn'); stopDanmu(); });
+
+  } catch(e) {
+    log(`初始化失败：${e.message}`, 'err');
+  }
+}
+
+function stopPlay() {
+  if (player) {
+    try { player.pause(); player.dispose(); } catch(e) {}
+    player = null;
+  }
+  stopDanmu();
+  log('已停止播放', 'info');
+}
+
+// ── 福袋逻辑 ─────────────────────────────────
+let lbJoined = false;
+let lbTimerSec = 247; // 4分07秒
+let lbTimerInterval = null;
+
+// 奖品配置（随机一个）
+const lbPrizes = [
+  { type:'win',  icon:'🥩', title:'精选金钱牛腱子肉 1份',  sub:'精选金钱牛腱子肉', expire:'有效期：2026-12-31', primary:'立即领取', secondary:'查看中奖名单', showCard:true },
+  { type:'win',  icon:'🪙', title:'积分100分',              sub:'恭喜获得积分奖励', expire:'积分永久有效', primary:'去查看积分', secondary:'查看中奖名单', showCard:true },
+  { type:'win',  icon:'🎫', title:'平台通用代金券 ¥10',    sub:'代金券已发放至账户', expire:'有效期至 2026-03-31', primary:'立即领取', secondary:'查看中奖名单', showCard:true },
+  { type:'miss', icon:'🍀', title:'没有抽中福袋',           sub:'没有一个好运气\n查看中奖名单', expire:'', primary:'', secondary:'我知道了', showCard:false },
+  { type:'near', icon:'😮', title:'1位差点追众',            sub:'差一点就追众了\n精选金钱牛腱子肉 1份', expire:'', primary:'', secondary:'查看中奖名单', showCard:false },
+];
+
+function startLbCountdown() {
+  if (lbTimerInterval) return;
+  lbTimerInterval = setInterval(() => {
+    lbTimerSec = Math.max(0, lbTimerSec - 1);
+    const mm = String(Math.floor(lbTimerSec / 60)).padStart(2,'0');
+    const ss = String(lbTimerSec % 60).padStart(2,'0');
+    const txt = `${mm}:${ss}`;
+    const t1 = document.getElementById('lucky-bag-timer');
+    const t2 = document.getElementById('lb-detail-cd');
+    if (t1) t1.textContent = txt;
+    if (t2) t2.textContent = txt;
+    if (lbTimerSec === 0) {
+      clearInterval(lbTimerInterval);
+      lbTimerInterval = null;
+      // 自动开奖
+      if (lbJoined) setTimeout(showLbResult, 500);
+    }
+  }, 1000);
+}
+
+function showLuckyBagDetail() {
+  const btn = document.getElementById('lb-join-btn');
+  if (lbJoined) {
+    btn.textContent = '已参与，等待开奖';
+    btn.classList.add('joined');
+  } else {
+    btn.textContent = '一键参与抽奖';
+    btn.classList.remove('joined');
+  }
+  document.getElementById('lb-detail-mask').classList.add('show');
+}
+function hideLbDetail(e) {
+  if (e && e.target !== document.getElementById('lb-detail-mask')) return;
+  document.getElementById('lb-detail-mask').classList.remove('show');
+}
+function hideLbDetailForce() {
+  document.getElementById('lb-detail-mask').classList.remove('show');
+}
+
+function joinLuckyBag() {
+  if (lbJoined) return;
+  lbJoined = true;
+  const btn = document.getElementById('lb-join-btn');
+  btn.textContent = '已参与，等待开奖 ✓';
+  btn.classList.add('joined');
+  startLbCountdown();
+  // 3秒后关闭弹窗，给用户反馈
+  setTimeout(hideLbDetailForce, 1200);
+}
+
+function showLbResult() {
+  // 随机一个奖品
+  const prize = lbPrizes[Math.floor(Math.random() * lbPrizes.length)];
+  const card = document.getElementById('lb-result-card');
+  card.className = 'lb-result-card' + (prize.type !== 'win' ? ' no-win' : '');
+
+  document.getElementById('lb-res-icon').textContent   = prize.icon;
+  document.getElementById('lb-res-title').textContent  = prize.title;
+  document.getElementById('lb-res-sub').textContent    = prize.sub;
+  document.getElementById('lb-prize-icon').textContent = prize.icon;
+  document.getElementById('lb-prize-title').textContent = prize.sub;
+  document.getElementById('lb-prize-expire').textContent = prize.expire;
+
+  const prizeCard = document.getElementById('lb-prize-card');
+  prizeCard.style.display = prize.showCard ? 'flex' : 'none';
+
+  const primaryBtn = document.getElementById('lb-res-primary-btn');
+  if (prize.primary) {
+    primaryBtn.style.display = 'block';
+    primaryBtn.textContent = prize.primary;
+  } else {
+    primaryBtn.style.display = 'none';
+  }
+  document.getElementById('lb-res-secondary-btn').textContent = prize.secondary;
+
+  const agreeEl = document.getElementById('lb-res-agree');
+  agreeEl.style.display = prize.showCard ? 'block' : 'none';
+
+  document.getElementById('lb-result-mask').classList.add('show');
+}
+
+function hideLbResult() {
+  document.getElementById('lb-result-mask').classList.remove('show');
+  lbJoined = false;
+  lbTimerSec = 247;
+  const t1 = document.getElementById('lucky-bag-timer');
+  if (t1) t1.textContent = '04:07';
+}
+
+// 页面加载后启动福袋倒计时（模拟主播开了一个福袋）
+window.addEventListener('DOMContentLoaded', () => {
+  startLbCountdown();
+});
+
+// ── 商品数据 ─────────────────────────────────
+const goodsData = [
+  { id:1, emoji:'🍒', name:'冷丰优选3J智利车厘子 鲜嫩多汁 坏了包退', tag:'坏了包退 三天内到货', price:'128.8', sold:'', category:'水果', onAir:true, soldOut:false },
+  { id:2, emoji:'🥩', name:'精选金钱牛腱子肉 软烂入味 已售188份', tag:'已售188', price:'96.8', sold:'188', category:'生鲜', onAir:false, soldOut:false },
+  { id:3, emoji:'🦀', name:'阳澄湖大闸蟹 膏脂肥美 坏了包退', tag:'坏了包退', price:'128.8', sold:'', category:'生鲜', onAir:false, soldOut:false },
+  { id:4, emoji:'🍊', name:'冷丰优选赣南脐橙 自然成熟 爆甜速发', tag:'坏果包退 三天内到货', price:'38.8', sold:'', category:'水果', onAir:false, soldOut:true },
+  { id:5, emoji:'🥜', name:'原味腰果仁 大颗粒饱满 每日坚果首选', tag:'坏了包退', price:'59.9', sold:'326', category:'坚果', onAir:false, soldOut:false },
+];
+
+let currentTab = '全部';
+let currentQty = 1;
+
+function renderGoods(list) {
+  const el = document.getElementById('goods-list');
+  if (!list.length) { el.innerHTML = '<div style="text-align:center;padding:40px 0;color:#999;font-size:14px;">暂无商品</div>'; return; }
+  el.innerHTML = list.map((g, i) => `
+    <div class="goods-list-item">
+      <div class="goods-list-rank ${i===0?'top1':i===1?'top2':i===2?'top3':''}">${i+1}</div>
+      <div class="goods-list-thumb">${g.emoji}</div>
+      <div class="goods-list-info">
+        <div class="goods-list-name">${g.name}</div>
+        <div class="goods-list-tag">
+          ${g.onAir?'<span class="on-air">▶ 讲解中</span>':''}${g.tag}
+        </div>
+        <div class="goods-list-bottom">
+          <div>
+            <span class="goods-list-price"><span class="unit">¥</span>${g.price}</span>
+            ${g.sold?`<span style="font-size:11px;color:#999;margin-left:4px;">已售${g.sold}</span>`:''}
+          </div>
+          <div class="goods-buy-action">
+            <div class="goods-cart-icon">🛒</div>
+            <button class="goods-grab-btn ${g.soldOut?'sold-out':''}"
+              onclick="${g.soldOut?'':'showBuyModal({emoji:\''+g.emoji+'\',price:\''+g.price+'\',name:\''+g.name+'\'})'}">
+              ${g.soldOut?'已售磬':'去抢购'}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function filterGoods() {
+  const kw = (document.getElementById('goods-search').value || '').trim();
+  let list = currentTab === '全部' ? goodsData : goodsData.filter(g => g.category === currentTab);
+  if (kw) list = list.filter(g => g.name.includes(kw));
+  renderGoods(list);
+}
+
+function switchTab(el, tab) {
+  currentTab = tab;
+  document.querySelectorAll('.goods-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  filterGoods();
+}
+
+function showGoodsPanel() {
+  document.getElementById('goods-panel-mask').classList.add('show');
+  document.getElementById('goods-panel').classList.add('show');
+  renderGoods(goodsData);
+}
+function hideGoodsPanel() {
+  document.getElementById('goods-panel-mask').classList.remove('show');
+  document.getElementById('goods-panel').classList.remove('show');
+}
+
+// ── 抢购弹窗 ─────────────────────────────────
+function showBuyModal(goods) {
+  currentQty = 1;
+  document.getElementById('bm-thumb').textContent = goods.emoji;
+  document.getElementById('bm-price').textContent = goods.price;
+  document.getElementById('bm-name').textContent = goods.name;
+  document.getElementById('bm-qty').textContent = 1;
+  document.getElementById('buy-modal-mask').classList.add('show');
+}
+function hideBuyModal(e) {
+  if (e && e.target !== document.getElementById('buy-modal-mask')) return;
+  document.getElementById('buy-modal-mask').classList.remove('show');
+}
+function selectSpec(el) {
+  document.querySelectorAll('.spec-tag').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+}
+function changeQty(delta) {
+  currentQty = Math.max(1, currentQty + delta);
+  document.getElementById('bm-qty').textContent = currentQty;
+}
+function confirmBuy() {
+  const price = document.getElementById('bm-price').textContent;
+  const name = document.getElementById('bm-name').textContent;
+  const spec = document.querySelector('.spec-tag.active')?.textContent || '';
+  document.getElementById('buy-modal-mask').classList.remove('show');
+  // 实际项目对接下单接口
+  setTimeout(() => alert(`✅ 下单成功！\n${name}\n规格：${spec}  数量：${currentQty}\n合计：¥${(parseFloat(price)*currentQty).toFixed(1)}`), 100);
+}
+</script>
+</body>
+</html>

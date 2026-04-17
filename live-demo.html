@@ -386,7 +386,13 @@
       <button type="button" class="round-btn" onclick="togglePush()" id="btn-push-toggle">
         <span id="push-icon">▶</span>
       </button>
-      <button type="button" class="round-btn round-btn-gray" onclick="showSettings()">🛒</button>
+      <button type="button" class="round-btn round-btn-gray" onclick="showSettings()" aria-label="购物车">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 4h2l2.2 11.2a2 2 0 0 0 2 1.6h8.4a2 2 0 0 0 2-1.5L21.5 8H6.2"/>
+          <circle cx="10" cy="20" r="1.4" fill="currentColor"/>
+          <circle cx="18" cy="20" r="1.4" fill="currentColor"/>
+        </svg>
+      </button>
       <button type="button" class="round-btn round-btn-gray" onclick="showSettings()">📊</button>
     </div>
   </div>
@@ -397,7 +403,13 @@
       <div class="side-btn-label">设置</div>
     </div>
     <div class="side-btn">
-      <div class="side-btn-icon">🛒</div>
+      <div class="side-btn-icon">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 4h2l2.2 11.2a2 2 0 0 0 2 1.6h8.4a2 2 0 0 0 2-1.5L21.5 8H6.2"/>
+          <circle cx="10" cy="20" r="1.4" fill="currentColor"/>
+          <circle cx="18" cy="20" r="1.4" fill="currentColor"/>
+        </svg>
+      </div>
       <div class="side-btn-label">商品</div>
     </div>
     <div class="side-btn">
@@ -524,7 +536,7 @@ async function startPush() {
     livePusher.setAudioQuality('standard');
     livePusher.setProperty('setVideoFPS', 25);
     try {
-      const vres = { '480p': { width: 540, height: 960 }, '720p': { width: 720, height: 1280 }, '1080p': { width: 1080, height: 1920 } }[vq] || { width: 720, height: 1280 };
+      const vres = { '480p': { width: 854, height: 480 }, '720p': { width: 1280, height: 720 }, '1080p': { width: 1920, height: 1080 } }[vq] || { width: 1280, height: 720 };
       livePusher.setProperty('setVideoResolution', vres);
     } catch (e) { /* SDK 不支持时忽略 */ }
 

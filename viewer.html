@@ -114,7 +114,7 @@
       width: 43px; height: 43px;
       border-radius: 50%;
       border: 1.5px solid #fff;
-      background: url(https://lanhu-dds-backend.oss-cn-beijing.aliyuncs.com/merge_image/imgs/e3a2fdc6b43847498e11b3d577403570_mergeImage.png) center/cover;
+      background: url(images/host-avatar.png) center/cover;
       flex-shrink: 0;
     }
     .anchor-info { min-width: 0; }
@@ -313,11 +313,10 @@
     }
     .like-btn-wrap {
       width: 46px; height: 46px;
-      background: rgba(0,0,0,.3); border-radius: 50%;
       display: flex; align-items: center; justify-content: center;
       cursor: pointer; flex-shrink: 0;
     }
-    .like-btn-wrap img, .like-btn-wrap span { font-size: 24px; }
+    .like-btn-wrap img { width: 42px; height: 42px; display: block; }
     .input-box {
       flex: 1;
       background: rgba(0,0,0,.3); border-radius: 22px;
@@ -330,13 +329,10 @@
     .cart-btn {
       position: relative;
       width: 46px; height: 46px;
-      background: linear-gradient(135deg,#ff6034,#ee0a24);
-      border-radius: 50%;
       display: flex; align-items: center; justify-content: center;
       cursor: pointer; flex-shrink: 0;
-      box-shadow: 0 2px 10px rgba(238,10,36,.5);
     }
-    .cart-btn svg { width: 26px; height: 26px; color: #fff; }
+    .cart-btn img { width: 42px; height: 42px; display: block; }
 
     /* ── 飘心动画 ── */
     @keyframes floatHeart {
@@ -511,11 +507,9 @@
     }
     .goods-cart-icon {
       width: 32px; height: 32px; display: flex; align-items: center;
-      justify-content: center; color: #ee0a24;
-      border: 1.5px solid #ee0a24; border-radius: 50%;
-      background: #fff5f5;
+      justify-content: center;
     }
-    .goods-cart-icon svg { width: 18px; height: 18px; }
+    .goods-cart-icon img { width: 26px; height: 26px; display: block; }
     .goods-grab-btn {
       background: linear-gradient(90deg,#ff6034,#ee0a24);
       color: #fff; border: none; border-radius: 20px;
@@ -797,18 +791,14 @@
   <!-- 底部输入栏 -->
   <div class="bottom-bar">
     <div class="like-btn-wrap" onclick="sendLike()">
-      <span>👍</span>
+      <img src="images/composer-like.png" alt="赞">
     </div>
     <div class="input-box" onclick="showDrawer()">
       <span class="input-placeholder">说点什么…</span>
       <span class="input-emoji">😊</span>
     </div>
     <div class="cart-btn" onclick="showGoodsPanel()">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M3 4h2l2.2 11.2a2 2 0 0 0 2 1.6h8.4a2 2 0 0 0 2-1.5L21.5 8H6.2"/>
-        <circle cx="10" cy="20" r="1.4" fill="currentColor"/>
-        <circle cx="18" cy="20" r="1.4" fill="currentColor"/>
-      </svg>
+      <img src="images/composer-cart.png" alt="购物车">
     </div>
   </div>
 
@@ -1222,11 +1212,7 @@ function renderGoods(list) {
           </div>
           <div class="goods-buy-action">
             <div class="goods-cart-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M3 4h2l2.2 11.2a2 2 0 0 0 2 1.6h8.4a2 2 0 0 0 2-1.5L21.5 8H6.2"/>
-                <circle cx="10" cy="20" r="1.4" fill="currentColor"/>
-                <circle cx="18" cy="20" r="1.4" fill="currentColor"/>
-              </svg>
+              <img src="images/live-sheet-cart-red.png" alt="加购">
             </div>
             <button class="goods-grab-btn ${g.soldOut?'sold-out':''}"
               onclick="${g.soldOut?'':'showBuyModal({emoji:\''+g.emoji+'\',price:\''+g.price+'\',name:\''+g.name+'\'})'}">

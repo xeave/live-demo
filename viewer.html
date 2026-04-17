@@ -55,8 +55,16 @@
     }
     #player-container {
       width: 100%; height: 100%;
-      object-fit: cover;
+      /* contain：完整显示主播画面（可能留黑边），避免 cover 导致画面被裁 */
+      object-fit: contain;
       display: block;
+      background: #000;
+    }
+    /* TCPlayer 会在容器内再套一层 <video>，同样铺满并完整显示 */
+    #player-container video {
+      width: 100% !important;
+      height: 100% !important;
+      object-fit: contain !important;
       background: #000;
     }
 
@@ -993,7 +1001,7 @@ function startPlay() {
   stopPlay();
 
   const wrap = document.getElementById('player-wrap');
-  wrap.innerHTML = '<video id="player-container" preload="auto" playsinline webkit-playsinline style="width:100%;height:100%;object-fit:cover;display:block;background:#000;"></video>';
+  wrap.innerHTML = '<video id="player-container" preload="auto" playsinline webkit-playsinline style="width:100%;height:100%;object-fit:contain;display:block;background:#000;"></video>';
 
   try {
     log(`初始化播放器：${url}`, 'info');

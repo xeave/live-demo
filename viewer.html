@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <meta name="repository" content="https://github.com/xeave/live-demo" />
-  <title>冷风直播 — 观众</title>
+  <title>冷丰直播 — 观众</title>
 
   <!-- TCPlayerLite v4 + TXLivePlayer（支持 WebRTC 拉流，无需 License） -->
   <link href="https://web.sdk.qcloud.com/player/tcplayer/release/v4.9.1/tcplayer.min.css" rel="stylesheet"/>
@@ -55,16 +55,28 @@
     }
     #player-container {
       width: 100%; height: 100%;
-      /* contain：完整显示主播画面（可能留黑边），避免 cover 导致画面被裁 */
-      object-fit: contain;
+      /* cover：竖屏撑满全屏，参照主流直播（淘宝/抖音）*/
+      object-fit: cover;
       display: block;
       background: #000;
     }
-    /* TCPlayer 会在容器内再套一层 <video>，同样铺满并完整显示 */
-    #player-container video {
+    /* TCPlayer 会在容器内再套一层 <video>/包裹层，统一让画面铺满并裁切多余部分 */
+    #player-container video,
+    #player-wrap video {
       width: 100% !important;
       height: 100% !important;
-      object-fit: contain !important;
+      object-fit: cover !important;
+      background: #000;
+      position: absolute;
+      inset: 0;
+    }
+    /* TCPlayer 外层 wrapper（.tcplayer / video-js）也撑满 */
+    #player-wrap .tcplayer,
+    #player-wrap .video-js {
+      position: absolute !important;
+      inset: 0 !important;
+      width: 100% !important;
+      height: 100% !important;
       background: #000;
     }
 
@@ -107,10 +119,10 @@
     }
     .anchor-info { min-width: 0; }
     .anchor-name {
-      color: #fff; font-size: 15px; font-weight: 600;
+      color: #fff; font-size: 17px; font-weight: 600;
       white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
     }
-    .anchor-viewers { color: rgba(255,255,255,.85); font-size: 12px; margin-top: 1px; }
+    .anchor-viewers { color: rgba(255,255,255,.85); font-size: 14px; margin-top: 1px; }
     /* 关注+分享按钮 */
     .top-actions {
       display: flex; align-items: center; gap: 6px; flex-shrink: 0;
@@ -119,7 +131,7 @@
       height: 30px; padding: 0 12px;
       border-radius: 15px; border: none;
       background: linear-gradient(90deg, #ff6034, #ee0a24);
-      color: #fff; font-size: 12px; font-weight: 600;
+      color: #fff; font-size: 14px; font-weight: 600;
       cursor: pointer; white-space: nowrap;
     }
     .follow-btn.followed { background: rgba(255,255,255,.25); }
@@ -128,8 +140,26 @@
       background: rgba(0,0,0,.3); border-radius: 4px;
       padding: 4px 8px; gap: 4px; cursor: pointer;
     }
-    .share-icon { font-size: 14px; }
-    .share-text { color: #fff; font-size: 12px; }
+    .share-icon { font-size: 16px; }
+    .share-text { color: #fff; font-size: 14px; }
+    .complain-area { background: rgba(240,40,26,.18); border: 1px solid rgba(240,40,26,.55); }
+    .complain-icon {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 16px; height: 16px; line-height: 1;
+      font-size: 0;
+      background: #f0281a;
+      color: #fff;
+      clip-path: polygon(50% 0%, 100% 100%, 0% 100%);
+      position: relative;
+    }
+    .complain-icon::after {
+      content: '!';
+      font-size: 10px;
+      font-weight: 900;
+      color: #fff;
+      font-family: Arial, sans-serif;
+      margin-top: 4px;
+    }
 
     /* 第二行：投诉 + 已看时长 */
     .top-row2 {
@@ -148,9 +178,9 @@
       padding: 7px 5px 3px 6px;
       text-align: center;
     }
-    .watched-label { color: #fff; font-size: 13px; font-weight: 500; }
-    .watched-time  { color: #fff; font-size: 13px; font-weight: 500; margin: -2px 0; }
-    .watched-score { color: #803e0a; font-size: 11px; font-weight: 500; }
+    .watched-label { color: #fff; font-size: 15px; font-weight: 500; }
+    .watched-time  { color: #fff; font-size: 15px; font-weight: 500; margin: -2px 0; }
+    .watched-score { color: #803e0a; font-size: 13px; font-weight: 500; }
 
     /* ── 右侧功能按钮（签到/领取/倒计时）── */
     .right-actions {
@@ -214,8 +244,8 @@
       font-size: 14px;
       display: flex; align-items: center; justify-content: center;
     }
-    .danmu-name { color: #4ff9fc; font-size: 13px; font-weight: 500; }
-    .danmu-text { color: #fff; font-size: 13px; }
+    .danmu-name { color: #4ff9fc; font-size: 15px; font-weight: 500; }
+    .danmu-text { color: #fff; font-size: 15px; }
 
     /* 商品卡片 */
     .goods-card {
@@ -239,9 +269,9 @@
       display: flex; align-items: center; justify-content: center; gap: 4px;
     }
     .goods-tag-icon { font-size: 14px; }
-    .goods-tag-text { color: #fff; font-size: 13px; font-weight: 600; }
+    .goods-tag-text { color: #fff; font-size: 15px; font-weight: 600; }
     .goods-name {
-      color: #333; font-size: 13px; font-weight: 500;
+      color: #333; font-size: 15px; font-weight: 500;
       padding: 3px 4px 0;
       line-height: 1.4;
       display: -webkit-box; -webkit-line-clamp: 2;
@@ -295,7 +325,7 @@
       display: flex; align-items: center; justify-content: space-between;
       cursor: pointer;
     }
-    .input-placeholder { color: #fff; font-size: 14px; font-weight: 500; }
+    .input-placeholder { color: #fff; font-size: 16px; font-weight: 500; }
     .input-emoji { font-size: 22px; }
     .cart-btn {
       width: 46px; height: 46px;
@@ -661,9 +691,10 @@
 
 <div class="live-wrap">
 
-  <!-- 播放器全屏背景 -->
+  <!-- 播放器全屏背景（竖屏撑满，cover 裁切） -->
   <div id="player-wrap">
-    <video id="player-container" preload="auto" playsinline webkit-playsinline></video>
+    <video id="player-container" preload="auto" playsinline webkit-playsinline
+      style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0;background:#000;"></video>
   </div>
 
   <!-- 顶部信息栏 -->
@@ -679,16 +710,14 @@
       </div>
       <div class="top-actions">
         <button class="follow-btn" id="follow-btn" onclick="toggleFollow()">+ 关注</button>
-        <div class="share-area" onclick="showDrawer()">
-          <span class="share-icon">⚙️</span>
-          <span class="share-text">设置</span>
+        <div class="share-area complain-area" onclick="alert('投诉已提交，我们会尽快处理')">
+          <span class="share-icon complain-icon">⚠️</span>
+          <span class="share-text">投诉</span>
         </div>
       </div>
     </div>
     <div class="top-row2">
-      <div class="complain-btn">
-        <span>📢</span><span>投诉</span>
-      </div>
+      <div style="flex:1"></div>
       <div class="watched-badge">
         <div class="watched-label">已看</div>
         <div class="watched-time" id="watch-time">00:00</div>
@@ -1001,7 +1030,7 @@ function startPlay() {
   stopPlay();
 
   const wrap = document.getElementById('player-wrap');
-  wrap.innerHTML = '<video id="player-container" preload="auto" playsinline webkit-playsinline style="width:100%;height:100%;object-fit:contain;display:block;background:#000;"></video>';
+  wrap.innerHTML = '<video id="player-container" preload="auto" playsinline webkit-playsinline style="width:100%;height:100%;object-fit:cover;display:block;background:#000;position:absolute;inset:0;"></video>';
 
   try {
     log(`初始化播放器：${url}`, 'info');

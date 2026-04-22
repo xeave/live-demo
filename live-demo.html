@@ -137,6 +137,43 @@
       display: flex; align-items: center; gap: 4px; margin-top: 2px;
     }
     .anchor-top-right { display: flex; align-items: center; gap: 8px; }
+    .room-notice {
+      position: absolute;
+      z-index: 1;
+      top: 104px;
+      left: 14px;
+      right: 72px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: 16px;
+      background: rgba(10,10,10,.42);
+      backdrop-filter: blur(10px);
+      color: #fff;
+    }
+    .room-notice-label {
+      flex-shrink: 0;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      height: 22px;
+      padding: 0 8px;
+      border-radius: 999px;
+      background: linear-gradient(90deg,#ffb347,#ff6f3c);
+      color: #fff;
+      font-size: 11px;
+      font-weight: 700;
+    }
+    .room-notice-text {
+      min-width: 0;
+      font-size: 13px;
+      line-height: 1.35;
+      color: rgba(255,255,255,.94);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
     .stat-pill {
       background: rgba(0,0,0,.45);
       border-radius: 20px;
@@ -161,69 +198,182 @@
     .danmu-area {
       position: absolute;
       z-index: 1;
-      left: 0; right: 80px;
-      bottom: 100px;
-      max-height: 220px;
+      left: 12px;
+      right: 12px;
+      bottom: calc(64px + var(--safe-bottom));
+      height: clamp(182px, 29vh, 236px);
       overflow: hidden;
-      padding: 0 14px;
+      --side-safe-width: clamp(84px, 22vw, 96px);
+      pointer-events: none;
       display: flex;
       flex-direction: column;
-      gap: 6px;
+      gap: 8px;
       justify-content: flex-end;
+      align-items: flex-start;
     }
     .danmu-item {
+      --lane-width: calc(100% - 12px);
       display: inline-flex;
       align-items: center;
-      gap: 5px;
-      background: rgba(0,0,0,.4);
-      backdrop-filter: blur(4px);
-      border-radius: 16px;
-      padding: 6px 14px;
+      gap: 6px;
+      min-height: 34px;
+      background: linear-gradient(90deg, rgba(20,20,20,.72), rgba(20,20,20,.42));
+      backdrop-filter: blur(6px);
+      border-radius: 18px;
+      padding: 5px 12px 5px 6px;
       font-size: 14px;
       color: #fff;
-      max-width: 90%;
       width: fit-content;
+      max-width: min(100%, var(--lane-width));
+      box-shadow: 0 8px 24px rgba(0,0,0,.14);
     }
-    .danmu-name { color: #ffd740; font-weight: 600; }
+    .danmu-item--wide {
+      --lane-width: calc(100% - 12px);
+    }
+    .danmu-item--side-safe {
+      --lane-width: calc(100% - var(--side-safe-width));
+    }
+    .danmu-item--system {
+      background: linear-gradient(90deg, rgba(80,56,24,.72), rgba(48,35,17,.46));
+    }
+    .danmu-meta {
+      display: inline-flex;
+      align-items: baseline;
+      flex-wrap: wrap;
+      gap: 2px 4px;
+      flex-shrink: 0;
+      min-width: 0;
+    }
+    .danmu-role-badge,
+    .danmu-level-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      height: 18px;
+      padding: 0 7px;
+      border-radius: 999px;
+      font-size: 10px;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+    .danmu-role-badge.role-anchor {
+      background: linear-gradient(90deg,#ff7b54,#ff2d20);
+      color: #fff;
+    }
+    .danmu-role-badge.role-vip {
+      background: linear-gradient(90deg,#ffd56a,#ff9f1f);
+      color: #683500;
+    }
+    .danmu-role-badge.role-viewer {
+      background: rgba(255,255,255,.14);
+      color: rgba(255,255,255,.88);
+    }
+    .danmu-level-badge {
+      background: rgba(255,215,64,.16);
+      border: 1px solid rgba(255,215,64,.18);
+      color: #ffe58f;
+    }
+    .danmu-name {
+      color: #ffd740;
+      font-size: 14px;
+      font-weight: 600;
+      white-space: nowrap;
+      flex-shrink: 0;
+      line-height: 1.3;
+      max-width: 96px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .danmu-text {
+      min-width: 0;
+      line-height: 1.3;
+      word-break: break-word;
+      overflow-wrap: anywhere;
+    }
+    .danmu-item--system .danmu-name {
+      color: #79f8da;
+    }
+    @keyframes floatAnchorHeart {
+      0% { transform: translateY(0) scale(1); opacity: 1; }
+      100% { transform: translateY(-180px) scale(1.5); opacity: 0; }
+    }
+    .anchor-float-heart {
+      position: fixed;
+      right: 56px;
+      bottom: 110px;
+      font-size: 22px;
+      pointer-events: none;
+      z-index: 20;
+      animation: floatAnchorHeart 1.4s ease-out forwards;
+    }
 
     .anchor-bottom {
       position: absolute;
       z-index: 1;
       bottom: 0; left: 0; right: 0;
-      padding: 10px 14px calc(10px + var(--safe-bottom));
+      padding: 8px 12px calc(8px + var(--safe-bottom));
       background: linear-gradient(to top, rgba(0,0,0,.7) 0%, transparent 100%);
     }
     .anchor-input-row {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 6px;
     }
     .fake-input {
       flex: 1;
-      height: 40px;
       background: rgba(255,255,255,.15);
       backdrop-filter: blur(4px);
       border-radius: 20px;
-      padding: 0 16px;
-      line-height: 40px;
+      padding: 4px 6px 4px 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-height: 38px;
+    }
+    .anchor-chat-inline-input {
+      flex: 1;
+      min-width: 0;
+      border: none;
+      outline: none;
+      background: transparent;
+      color: #fff;
       font-size: 15px;
-      color: rgba(255,255,255,.6);
+      font-weight: 500;
+    }
+    .anchor-chat-inline-input::placeholder {
+      color: rgba(255,255,255,.66);
+    }
+    .anchor-chat-send-btn {
+      height: 30px;
+      min-width: 52px;
+      padding: 0 12px;
+      border-radius: 16px;
+      border: none;
+      background: var(--red);
+      color: #fff;
+      font-size: 13px;
+      font-weight: 700;
       cursor: pointer;
+      flex-shrink: 0;
+    }
+    .anchor-chat-send-btn:active {
+      opacity: .85;
+      transform: scale(.98);
     }
     .round-btn {
-      width: 42px; height: 42px;
+      width: 38px; height: 38px;
       border-radius: 50%;
       border: none;
       background: var(--red);
       color: #fff;
-      font-size: 18px;
+      font-size: 16px;
       cursor: pointer;
       display: flex; align-items: center; justify-content: center;
       flex-shrink: 0;
       box-shadow: 0 2px 12px rgba(240,40,26,.5);
     }
     .round-btn-gray { background: rgba(255,255,255,.2); box-shadow: none; }
-    .round-btn-img img { width: 24px; height: 24px; display: block; filter: brightness(0) invert(1); }
+    .round-btn-img img { width: 22px; height: 22px; display: block; filter: brightness(0) invert(1); }
 
     .settings-mask {
       position: absolute; inset: 0;
@@ -319,11 +469,11 @@
 
     .side-btns {
       position: absolute;
-      right: 12px;
-      bottom: 110px;
+      right: 10px;
+      bottom: calc(110px + var(--safe-bottom));
       display: flex;
       flex-direction: column;
-      gap: 16px;
+      gap: 12px;
       align-items: center;
       z-index: 5;
     }
@@ -331,19 +481,19 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 3px;
+      gap: 4px;
       cursor: pointer;
     }
     .side-btn-icon {
-      width: 44px; height: 44px;
+      width: 40px; height: 40px;
       border-radius: 50%;
       background: rgba(0,0,0,.45);
       backdrop-filter: blur(6px);
       display: flex; align-items: center; justify-content: center;
-      font-size: 20px;
+      font-size: 18px;
       border: 1px solid rgba(255,255,255,.15);
     }
-    .side-btn-icon-img img { width: 24px; height: 24px; display: block; filter: brightness(0) invert(1); }
+    .side-btn-icon-img img { width: 22px; height: 22px; display: block; filter: brightness(0) invert(1); }
     .side-btn-label {
       font-size: 12px;
       color: rgba(255,255,255,.8);
@@ -365,8 +515,8 @@
     <div class="anchor-info">
       <div class="anchor-avatar">🐱</div>
       <div>
-        <div class="anchor-name">冷丰直播间</div>
-        <div class="anchor-viewers"><span class="dot" id="push-dot"></span> <span id="push-status">未开播</span></div>
+        <div class="anchor-name" id="anchor-room-title">冷丰直播间</div>
+        <div class="anchor-viewers"><span class="dot" id="push-dot"></span> <span id="push-status">未开播</span> <span id="room-online-count">· --在线</span> <span id="room-like-count">· 0赞</span></div>
       </div>
     </div>
     <div class="anchor-top-right">
@@ -378,21 +528,33 @@
     </div>
   </div>
 
+  <div class="room-notice" id="anchor-room-notice" hidden>
+    <span class="room-notice-label">公告</span>
+    <span class="room-notice-text" id="anchor-room-notice-text"></span>
+  </div>
+
   <div class="danmu-area" id="danmu-area">
-    <div class="danmu-item"><span class="danmu-name">系统</span> 欢迎来到冷丰直播间 🎉</div>
+    <div class="danmu-item danmu-item--system danmu-item--wide" data-message-type="system"><span class="danmu-name">系统：</span><span class="danmu-text">正在连接直播群...</span></div>
   </div>
 
   <div class="anchor-bottom">
     <div class="anchor-input-row">
-      <div class="fake-input">说点什么...</div>
+      <div class="fake-input">
+        <input
+          id="anchor-chat-inline-input"
+          class="anchor-chat-inline-input"
+          type="text"
+          maxlength="40"
+          placeholder="说点什么..."
+          aria-label="主播发送直播间消息"
+        />
+        <button type="button" class="anchor-chat-send-btn" onclick="sendAnchorMessage('inline')">发送</button>
+      </div>
       <button type="button" class="round-btn" onclick="togglePush()" id="btn-push-toggle">
         <span id="push-icon">▶</span>
       </button>
       <button type="button" class="round-btn round-btn-gray round-btn-img" onclick="showSettings()" aria-label="购物车">
         <img src="images/live-sheet-cart-red.png" alt="购物车">
-      </button>
-      <button type="button" class="round-btn round-btn-gray round-btn-img" onclick="showSettings()" aria-label="订单">
-        <img src="images/live-sheet-order.png" alt="订单">
       </button>
     </div>
   </div>
@@ -421,6 +583,13 @@
     <div class="drawer-handle"></div>
     <div class="drawer-title">推流设置</div>
     <div class="drawer-field">
+      <label>Demo 房间</label>
+      <div class="select-wrap">
+        <select id="anchor-room-select" onchange="handleAnchorRoomChange(this.value)"></select>
+      </div>
+      <div class="hint" id="anchor-room-hint">切换房间会重置当前主播控制台的配置。</div>
+    </div>
+    <div class="drawer-field">
       <label>WebRTC 推流地址</label>
       <input id="push-url" type="url" inputmode="url"
         value="webrtc://229319.push.tlivecloud.com/live/1?txSecret=cf9c27bc3ffb73bdf139d70c2de0c076&txTime=69F2B02F"
@@ -441,6 +610,29 @@
       <button type="button" class="btn btn-primary" id="btn-push" onclick="startPush()">▶ 开始推流</button>
       <button type="button" class="btn btn-secondary" id="btn-stop" onclick="stopPush()" disabled>■ 停止推流</button>
     </div>
+    <div class="drawer-field" style="margin-top:14px">
+      <label>发送弹幕</label>
+      <input id="anchor-chat-text" type="text" maxlength="40" placeholder="给观众发一条直播间消息" />
+      <div class="hint" id="anchor-im-status">IM 准备连接中...</div>
+    </div>
+    <div class="drawer-btns">
+      <button type="button" class="btn btn-primary" onclick="sendAnchorMessage()">发送弹幕</button>
+      <button type="button" class="btn btn-secondary" onclick="refreshAnchorOnlineCount()">刷新在线人数</button>
+    </div>
+    <div class="drawer-field" style="margin-top:14px">
+      <label>直播间公告</label>
+      <input id="anchor-announcement-text" type="text" maxlength="80" placeholder="输入直播间公告，例如今晚主推商品和下单提醒" />
+      <div class="hint">更新后会同步展示到所有观众页顶部。</div>
+    </div>
+    <div class="drawer-btns">
+      <button type="button" class="btn btn-primary" onclick="sendAnnouncement()">更新公告</button>
+      <button type="button" class="btn btn-secondary" onclick="fillDefaultAnnouncement()">恢复默认</button>
+    </div>
+    <div class="drawer-field" style="margin-top:14px">
+      <label>观众访问链接</label>
+      <input id="viewer-link" type="text" readonly />
+      <div class="hint">把这个链接发给同事，就能直接进入当前直播间。</div>
+    </div>
     <div class="log-box" id="push-log" style="margin-top:10px">
       <div class="info">填好推流地址后点「开始推流」</div>
     </div>
@@ -449,6 +641,9 @@
 </div>
 
 <script src="https://video.sdk.qcloudecdn.com/web/TXLivePusher-2.1.1.min.js" charset="utf-8"></script>
+<script src="vendor/tencentcloud-chat.js"></script>
+<script src="live-im-config.js"></script>
+<script src="live-im.js"></script>
 
 <script>
 function log(id, msg, type = 'info') {
@@ -460,9 +655,15 @@ function log(id, msg, type = 'info') {
   box.scrollTop = box.scrollHeight;
 }
 
-function showSettings() {
+function showSettings(mode) {
   document.getElementById('settings-mask').classList.add('show');
   document.getElementById('settings-drawer').classList.add('show');
+  if (mode === 'chat') {
+    requestAnimationFrame(() => {
+      const input = document.getElementById('anchor-chat-text');
+      if (input) input.focus();
+    });
+  }
 }
 function hideSettings() {
   document.getElementById('settings-mask').classList.remove('show');
@@ -478,22 +679,311 @@ function togglePush() {
   }
 }
 
-const fakeUsers = ['小明','辰辰','买买买','冰冰','大壮'];
-const fakeMsgs  = ['在吗主播！','这个多少钱？','好看！','链接链接！','已下单✅','求上链接','太好看了'];
-function addDanmu(name, msg) {
+const anchorRoomCatalog = window.LIVE_IM_CONFIG && typeof window.LIVE_IM_CONFIG.getRoomList === 'function'
+  ? window.LIVE_IM_CONFIG.getRoomList()
+  : [];
+let activeAnchorRoomId = window.LIVE_IM_CONFIG && typeof window.LIVE_IM_CONFIG.getRoomIdFromLocation === 'function'
+  ? window.LIVE_IM_CONFIG.getRoomIdFromLocation(window.location.search)
+  : 'orchard';
+let activeAnchorRoom = getAnchorRoomConfig(activeAnchorRoomId);
+const anchorRole = getAnchorRole();
+
+let anchorIM = null;
+let anchorLikeTotal = 0;
+
+function getAnchorRoomConfig(roomId) {
+  if (window.LIVE_IM_CONFIG && typeof window.LIVE_IM_CONFIG.getRoomConfig === 'function') {
+    return window.LIVE_IM_CONFIG.getRoomConfig(roomId);
+  }
+  return window.LIVE_IM_CONFIG || {};
+}
+
+function getAnchorRole() {
+  const params = new URLSearchParams(window.location.search);
+  const role = params.get('role');
+  const roles = window.LIVE_IM_CONFIG && window.LIVE_IM_CONFIG.roles;
+  if (role && roles && roles[role]) {
+    return role;
+  }
+  return (activeAnchorRoom && activeAnchorRoom.recommendedAnchorRole) || 'anchor';
+}
+
+function syncAnchorRoomQuery(roomId) {
+  const params = new URLSearchParams(window.location.search);
+  params.set('room', roomId);
+  const query = params.toString();
+  history.replaceState(null, '', `${window.location.pathname}${query ? `?${query}` : ''}`);
+}
+
+function renderAnchorRoomOptions() {
+  const select = document.getElementById('anchor-room-select');
+  if (!select) return;
+  select.innerHTML = anchorRoomCatalog.map(room => `
+    <option value="${room.roomId}">${room.title} · ${room.subtitle || '直播间'}</option>
+  `).join('');
+  select.value = activeAnchorRoomId;
+}
+
+function updateViewerLink() {
+  const input = document.getElementById('viewer-link');
+  if (!input) return;
+  const url = new URL('viewer.html', window.location.href);
+  url.searchParams.set('room', activeAnchorRoomId);
+  input.value = url.toString();
+}
+
+function resetAnchorDanmuArea() {
+  const area = document.getElementById('danmu-area');
+  area.innerHTML = '<div class="danmu-item danmu-item--system danmu-item--wide" data-message-type="system"><span class="danmu-name">系统：</span><span class="danmu-text">正在连接直播群...</span></div>';
+  refreshAnchorDanmuLayout();
+}
+
+function applyAnchorRoomConfig(roomId) {
+  activeAnchorRoomId = roomId;
+  activeAnchorRoom = getAnchorRoomConfig(roomId);
+  document.title = `${activeAnchorRoom.title} — 主播`;
+  document.getElementById('anchor-room-title').textContent = activeAnchorRoom.anchorRoomTitle || `${activeAnchorRoom.title}直播间`;
+  document.getElementById('push-url').value = activeAnchorRoom.pushUrl || '';
+  document.getElementById('anchor-room-hint').textContent = activeAnchorRoom.pushUrl
+    ? '当前房间已预置一条推流地址，也可以手动替换。'
+    : '当前房间还没预置真实推流地址，建议在这里粘贴腾讯云地址生成器给出的地址。';
+  document.getElementById('room-online-count').textContent = `· ${activeAnchorRoom.defaultViewerCount || '--'}在线`;
+  updateViewerLink();
+  fillDefaultAnnouncement();
+  setAnchorAnnouncement(activeAnchorRoom.announcement || '');
+  renderAnchorRoomOptions();
+  syncAnchorRoomQuery(activeAnchorRoomId);
+}
+
+function createAnchorBadge(className, text) {
+  const el = document.createElement('span');
+  el.className = className;
+  el.textContent = text;
+  return el;
+}
+
+function updateAnchorLikeCount(delta) {
+  anchorLikeTotal = Math.max(0, anchorLikeTotal + (delta || 0));
+  document.getElementById('room-like-count').textContent = `· ${anchorLikeTotal}赞`;
+}
+
+function refreshAnchorDanmuLayout() {
+  const area = document.getElementById('danmu-area');
+  const items = Array.from(area.children);
+  const safeCount = items.length >= 5 ? 3 : 2;
+
+  items.forEach((item, index) => {
+    const distanceFromBottom = items.length - index - 1;
+    const useSideSafeLane = items.length >= 3 && distanceFromBottom < safeCount;
+
+    item.classList.remove('danmu-item--wide', 'danmu-item--side-safe', 'danmu-item--system');
+    item.classList.add(useSideSafeLane ? 'danmu-item--side-safe' : 'danmu-item--wide');
+
+    if (item.dataset.messageType === 'system') {
+      item.classList.add('danmu-item--system');
+    }
+  });
+}
+
+function burstAnchorHeart() {
+  const heart = document.createElement('div');
+  const emojis = ['❤️', '💖', '💕', '🧡'];
+  heart.className = 'anchor-float-heart';
+  heart.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+  heart.style.right = (44 + Math.random() * 24) + 'px';
+  document.body.appendChild(heart);
+  setTimeout(() => heart.remove(), 1400);
+}
+
+function addDanmu(name, msg, profile = null) {
   const area = document.getElementById('danmu-area');
   const el = document.createElement('div');
+  const metaEl = document.createElement('div');
+  const nameEl = document.createElement('span');
+  const textEl = document.createElement('span');
+
   el.className = 'danmu-item';
-  el.innerHTML = `<span class="danmu-name">${name}</span> ${msg}`;
+  if ((profile && profile.messageType === 'system') || name === '系统') {
+    el.dataset.messageType = 'system';
+  }
+  metaEl.className = 'danmu-meta';
+  nameEl.className = 'danmu-name';
+  nameEl.textContent = `${name}：`;
+  textEl.className = 'danmu-text';
+  textEl.textContent = msg;
+
+  if (profile && profile.roleLabel) {
+    metaEl.appendChild(createAnchorBadge(`danmu-role-badge role-${profile.roleTone || profile.roleKey || 'viewer'}`, profile.roleLabel));
+  }
+  if (profile && profile.levelLabel) {
+    metaEl.appendChild(createAnchorBadge('danmu-level-badge', profile.levelLabel));
+  }
+  metaEl.appendChild(nameEl);
+
+  el.appendChild(metaEl);
+  el.appendChild(textEl);
   area.appendChild(el);
   if (area.children.length > 8) area.removeChild(area.children[0]);
+  refreshAnchorDanmuLayout();
 }
-setInterval(() => {
-  if (!document.getElementById('btn-stop').disabled) return;
-  const u = fakeUsers[Math.floor(Math.random() * fakeUsers.length)];
-  const m = fakeMsgs[Math.floor(Math.random() * fakeMsgs.length)];
-  addDanmu(u, m);
-}, 2500);
+
+function setAnchorImStatus(text) {
+  const el = document.getElementById('anchor-im-status');
+  if (el) el.textContent = text;
+}
+
+function setAnchorAnnouncement(text) {
+  const notice = document.getElementById('anchor-room-notice');
+  const textEl = document.getElementById('anchor-room-notice-text');
+  const input = document.getElementById('anchor-announcement-text');
+  const value = String(text || '').trim();
+
+  if (input && document.activeElement !== input) {
+    input.value = value;
+  }
+  if (!notice || !textEl) return;
+  if (!value) {
+    notice.hidden = true;
+    textEl.textContent = '';
+    return;
+  }
+
+  textEl.textContent = value;
+  notice.hidden = false;
+}
+
+function fillDefaultAnnouncement() {
+  const input = document.getElementById('anchor-announcement-text');
+  if (input) {
+    input.value = (activeAnchorRoom && activeAnchorRoom.announcement) || '';
+  }
+}
+
+async function destroyAnchorIM() {
+  if (!anchorIM) return;
+  if (typeof anchorIM.destroy === 'function') {
+    await anchorIM.destroy();
+  }
+  anchorIM = null;
+}
+
+async function initAnchorIM() {
+  try {
+    setAnchorImStatus('IM 连接中...');
+    anchorIM = LiveIM.createClient(anchorRole, {
+      log(message, type) {
+        log('push-log', message, type);
+      },
+      onTextMessage(message) {
+        addDanmu(message.nick, message.text, message.profile);
+      },
+      onLike(message) {
+        updateAnchorLikeCount(message.count);
+        addDanmu(message.nick, `点赞了直播间 x${message.count}`, message.profile);
+        for (let index = 0; index < Math.min(message.count, 5); index += 1) {
+          setTimeout(() => burstAnchorHeart(), index * 120);
+        }
+      },
+      onJoinNotice(message) {
+        addDanmu('系统', message.text);
+      },
+      onAnnouncement(message) {
+        setAnchorAnnouncement(message.text);
+        log('push-log', `直播公告已更新：${message.text}`, 'info');
+      },
+      onOnlineCount(count) {
+        document.getElementById('room-online-count').textContent = `· ${count}在线`;
+      },
+      onJoined() {
+        setAnchorImStatus(`IM 已加入直播群（${anchorRole}）`);
+      }
+    }, {
+      roomId: activeAnchorRoomId
+    });
+    await anchorIM.connect();
+    setAnchorImStatus(`IM 已连接，可给观众发消息（${anchorRole}）`);
+  } catch (error) {
+    setAnchorImStatus('IM 连接失败，请检查测试账号');
+    log('push-log', `IM 初始化失败：${LiveIM.normalizeError(error)}`, 'err');
+  }
+}
+
+async function handleAnchorRoomChange(roomId) {
+  if (!roomId || roomId === activeAnchorRoomId) return;
+  if (livePusher) {
+    stopPush();
+  }
+  await destroyAnchorIM();
+  resetAnchorDanmuArea();
+  anchorLikeTotal = 0;
+  document.getElementById('room-like-count').textContent = '· 0赞';
+  applyAnchorRoomConfig(roomId);
+  await initAnchorIM();
+  log('push-log', `已切换到 ${activeAnchorRoom.title}`, 'ok');
+}
+
+async function sendAnnouncement() {
+  const input = document.getElementById('anchor-announcement-text');
+  const text = input.value.trim();
+
+  if (!text) {
+    alert('请先输入公告内容');
+    input.focus();
+    return;
+  }
+  if (!anchorIM) {
+    alert('IM 还没连接好，请稍后重试');
+    return;
+  }
+
+  try {
+    await anchorIM.sendAnnouncement(text);
+    setAnchorAnnouncement(text);
+    log('push-log', '直播公告已更新 ✓', 'ok');
+  } catch (error) {
+    log('push-log', `直播公告更新失败：${LiveIM.normalizeError(error)}`, 'err');
+  }
+}
+
+async function sendAnchorMessage(source = 'drawer') {
+  const input = document.getElementById(source === 'inline' ? 'anchor-chat-inline-input' : 'anchor-chat-text');
+  const text = input.value.trim();
+  if (!text) {
+    if (source !== 'inline') {
+      alert('请先输入直播间消息');
+    }
+    input.focus();
+    return;
+  }
+  if (!anchorIM) {
+    alert('IM 还没连接好，请稍后重试');
+    return;
+  }
+
+  try {
+    await anchorIM.sendText(text, { priority: 'high' });
+    input.value = '';
+    if (source !== 'inline') {
+      hideSettings();
+    }
+    log('push-log', '直播间消息发送成功 ✓', 'ok');
+  } catch (error) {
+    log('push-log', `直播间消息发送失败：${LiveIM.normalizeError(error)}`, 'err');
+  }
+}
+
+async function refreshAnchorOnlineCount() {
+  if (!anchorIM) return;
+  try {
+    const count = await anchorIM.refreshOnlineCount();
+    if (typeof count === 'number') {
+      document.getElementById('room-online-count').textContent = `· ${count}在线`;
+      log('push-log', `在线人数已刷新：${count}`, 'info');
+    }
+  } catch (error) {
+    log('push-log', `刷新在线人数失败：${LiveIM.normalizeError(error)}`, 'warn');
+  }
+}
 
 let livePusher = null;
 
@@ -602,6 +1092,30 @@ function stopPush() {
     '<div class="video-placeholder"><div class="icon">🎙</div><p>点击「开始推流」开启摄像头</p></div>';
   log('push-log', '已停止推流', 'info');
 }
+
+window.addEventListener('DOMContentLoaded', () => {
+  applyAnchorRoomConfig(activeAnchorRoomId);
+  resetAnchorDanmuArea();
+  initAnchorIM();
+  document.getElementById('anchor-chat-inline-input').addEventListener('keydown', (event) => {
+    if (event.key === 'Enter') {
+      event.preventDefault();
+      sendAnchorMessage('inline');
+    }
+  });
+  document.getElementById('anchor-chat-text').addEventListener('keydown', (event) => {
+    if (event.key === 'Enter') {
+      event.preventDefault();
+      sendAnchorMessage();
+    }
+  });
+  document.getElementById('anchor-announcement-text').addEventListener('keydown', (event) => {
+    if (event.key === 'Enter') {
+      event.preventDefault();
+      sendAnnouncement();
+    }
+  });
+});
 </script>
 <div id="build-verify" class="build-verify" hidden aria-hidden="true"></div>
 <script>

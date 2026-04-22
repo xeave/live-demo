@@ -127,6 +127,19 @@
     .top-actions {
       display: flex; align-items: center; gap: 6px; flex-shrink: 0;
     }
+    .room-switch-btn {
+      height: 30px;
+      padding: 0 12px;
+      border-radius: 15px;
+      border: 1px solid rgba(255,255,255,.18);
+      background: rgba(0,0,0,.28);
+      color: #fff;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+      backdrop-filter: blur(10px);
+    }
     .follow-btn {
       height: 30px; padding: 0 12px;
       border-radius: 15px; border: none;
@@ -166,6 +179,64 @@
       display: flex; align-items: flex-start;
       justify-content: space-between;
       margin-top: 8px; padding-bottom: 8px;
+    }
+    .room-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      border-radius: 999px;
+      background: rgba(0,0,0,.34);
+      color: rgba(255,255,255,.94);
+      backdrop-filter: blur(10px);
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 600;
+      max-width: calc(100vw - 140px);
+    }
+    .room-pill-label {
+      color: rgba(255,255,255,.58);
+      font-weight: 500;
+    }
+    .room-pill-text {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .room-notice {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 2px;
+      margin-right: 80px;
+      padding: 8px 12px;
+      border-radius: 16px;
+      background: rgba(16,16,16,.42);
+      backdrop-filter: blur(10px);
+      color: #fff;
+      min-width: 0;
+    }
+    .room-notice-label {
+      flex-shrink: 0;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      height: 22px;
+      padding: 0 8px;
+      border-radius: 999px;
+      background: linear-gradient(90deg,#ffb347,#ff6f3c);
+      color: #fff;
+      font-size: 11px;
+      font-weight: 700;
+    }
+    .room-notice-text {
+      min-width: 0;
+      font-size: 13px;
+      line-height: 1.35;
+      color: rgba(255,255,255,.94);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
     .complain-btn {
       display: flex; align-items: center; gap: 4px;
@@ -214,51 +285,143 @@
     /* ── 弹幕 + 商品卡片区 ── */
     .bottom-content {
       position: absolute;
-      left: 0; right: 0;
-      bottom: 72px;
+      left: 12px; right: 12px;
+      bottom: calc(68px + env(safe-area-inset-bottom, 0px));
+      height: clamp(188px, 30vh, 248px);
       z-index: 10;
-      padding: 0 12px;
-      display: flex;
-      align-items: flex-end;
-      gap: 10px;
+      --goods-card-width: clamp(118px, 31vw, 132px);
+      --card-safe-gap: 12px;
+      pointer-events: none;
     }
 
     /* 弹幕列 */
     .danmu-col {
-      flex: 1; min-width: 0;
-      display: flex; flex-direction: column;
-      gap: 6px; overflow: hidden;
+      position: absolute;
+      inset: 0;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      align-items: flex-start;
+      gap: 8px;
+      overflow: hidden;
     }
     .danmu-item {
-      display: inline-flex; align-items: center; gap: 5px;
-      background: rgba(0,0,0,.3);
-      border-radius: 16px;
-      padding: 4px 12px 4px 4px;
-      width: fit-content; max-width: 100%;
+      --lane-width: calc(100% - 14px);
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      min-height: 34px;
+      background: linear-gradient(90deg, rgba(22,22,22,.72), rgba(22,22,22,.44));
+      backdrop-filter: blur(8px);
+      border-radius: 18px;
+      padding: 5px 12px 5px 6px;
+      width: fit-content;
+      max-width: min(100%, var(--lane-width));
+      box-shadow: 0 8px 24px rgba(0,0,0,.16);
+    }
+    .danmu-item--wide {
+      --lane-width: calc(100% - 14px);
+    }
+    .danmu-item--card-safe {
+      --lane-width: calc(100% - var(--goods-card-width) - var(--card-safe-gap));
+    }
+    .danmu-item--system {
+      background: linear-gradient(90deg, rgba(78,53,24,.72), rgba(43,33,17,.48));
     }
     .danmu-avatar {
-      width: 28px; height: 28px; border-radius: 50%;
-      border: 1px solid rgba(151,151,151,1);
-      background: rgba(100,100,100,.5);
+      width: 22px; height: 22px; border-radius: 50%;
+      border: 1px solid rgba(255,255,255,.28);
+      background: rgba(255,255,255,.16);
       flex-shrink: 0;
-      font-size: 14px;
+      font-size: 11px;
       display: flex; align-items: center; justify-content: center;
     }
-    .danmu-name { color: #4ff9fc; font-size: 15px; font-weight: 500; }
-    .danmu-text { color: #fff; font-size: 15px; }
+    .danmu-content {
+      min-width: 0;
+      display: flex;
+      align-items: baseline;
+      flex-wrap: wrap;
+      gap: 2px 4px;
+    }
+    .danmu-meta {
+      display: inline-flex;
+      align-items: baseline;
+      flex-wrap: wrap;
+      gap: 2px 4px;
+      flex-shrink: 0;
+      min-width: 0;
+    }
+    .danmu-role-badge,
+    .danmu-level-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      height: 18px;
+      padding: 0 7px;
+      border-radius: 999px;
+      font-size: 10px;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+    .danmu-role-badge.role-anchor {
+      background: linear-gradient(90deg,#ff7b54,#ff2d20);
+      color: #fff;
+    }
+    .danmu-role-badge.role-vip {
+      background: linear-gradient(90deg,#ffd56a,#ff9f1f);
+      color: #683500;
+    }
+    .danmu-role-badge.role-viewer {
+      background: rgba(255,255,255,.16);
+      color: rgba(255,255,255,.88);
+    }
+    .danmu-level-badge {
+      background: rgba(79,249,252,.16);
+      color: #9efcff;
+      border: 1px solid rgba(79,249,252,.24);
+    }
+    .danmu-name {
+      color: #4ff9fc;
+      font-size: 14px;
+      font-weight: 600;
+      white-space: nowrap;
+      flex-shrink: 0;
+      line-height: 1.3;
+      text-shadow: 0 1px 6px rgba(0,0,0,.22);
+      max-width: 96px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .danmu-text {
+      color: #fff;
+      font-size: 14px;
+      line-height: 1.3;
+      min-width: 0;
+      overflow-wrap: anywhere;
+      word-break: break-word;
+    }
+    .danmu-item--system .danmu-name {
+      color: #79f8da;
+    }
 
     /* 商品卡片 */
     .goods-card {
-      width: 148px; flex-shrink: 0;
+      position: absolute;
+      right: 0;
+      bottom: 0;
+      width: var(--goods-card-width);
       background: #fff;
-      border-radius: 6px;
+      border-radius: 12px;
       overflow: hidden;
       border: 1px solid #fff;
-      position: relative;
+      box-shadow: 0 14px 28px rgba(0,0,0,.22);
+      pointer-events: auto;
       cursor: pointer;
     }
     .goods-img-wrap {
-      width: 148px; height: 119px;
+      width: 100%;
+      aspect-ratio: 126 / 104;
       background: url(https://lanhu-dds-backend.oss-cn-beijing.aliyuncs.com/merge_image/imgs/12e04eba201b49a8a001101c3cd35787_mergeImage.png) center/cover;
       position: relative;
     }
@@ -269,37 +432,40 @@
       display: flex; align-items: center; justify-content: center; gap: 4px;
     }
     .goods-tag-icon { font-size: 14px; }
-    .goods-tag-text { color: #fff; font-size: 15px; font-weight: 600; }
+    .goods-tag-text { color: #fff; font-size: 13px; font-weight: 600; }
     .goods-name {
-      color: #333; font-size: 15px; font-weight: 500;
-      padding: 3px 4px 0;
-      line-height: 1.4;
+      color: #333; font-size: 13px; font-weight: 500;
+      padding: 6px 7px 0;
+      line-height: 1.35;
       display: -webkit-box; -webkit-line-clamp: 2;
       -webkit-box-orient: vertical; overflow: hidden;
     }
     .goods-bottom {
       display: flex; align-items: center;
       justify-content: space-between;
-      padding: 4px 4px 4px;
+      gap: 6px;
+      padding: 6px 7px 7px;
     }
     .goods-price {
       color: #fff; font-weight: 700;
       font-family: Arial Black, sans-serif;
+      white-space: nowrap;
     }
     .goods-price .unit { font-size: 12px; }
-    .goods-price .integer { font-size: 22px; line-height: 1; }
-    .goods-price .decimal { font-size: 14px; }
+    .goods-price .integer { font-size: 19px; line-height: 1; }
+    .goods-price .decimal { font-size: 12px; }
     .goods-buy-btn {
       background: url(https://lanhu-oss-proxy.lanhuapp.com/SketchPng9b4d04b7983d96028065f3251cfcb40e984d2bda0446e843b651302bcfe282c1) center/cover;
-      width: 38px; height: 28px;
+      width: 34px; height: 26px;
       display: flex; align-items: center; justify-content: center;
-      color: #fff; font-size: 14px; font-weight: 700;
+      color: #fff; font-size: 13px; font-weight: 700;
       cursor: pointer;
+      flex-shrink: 0;
     }
     .goods-price-wrap {
       background: url(https://lanhu-oss-proxy.lanhuapp.com/SketchPngc11643f4b35c372bf175b72748141be48139741d60de301f83a40a8c97690226) center/cover;
       background-size: 100% 100%;
-      padding: 3px 4px;
+      padding: 3px 5px;
       display: flex; align-items: baseline; gap: 1px;
     }
 
@@ -307,32 +473,184 @@
     .bottom-bar {
       position: absolute;
       bottom: 0; left: 0; right: 0;
-      padding: 10px 12px calc(10px + env(safe-area-inset-bottom, 0px));
+      padding: 8px 12px calc(8px + env(safe-area-inset-bottom, 0px));
       z-index: 10;
-      display: flex; align-items: center; gap: 8px;
+      display: flex; align-items: center; gap: 6px;
     }
     .like-btn-wrap {
-      width: 46px; height: 46px;
+      width: 42px; height: 42px;
       display: flex; align-items: center; justify-content: center;
       cursor: pointer; flex-shrink: 0;
+      position: relative;
     }
-    .like-btn-wrap img { width: 42px; height: 42px; display: block; }
+    .like-btn-wrap img { width: 38px; height: 38px; display: block; }
+    .like-count-badge {
+      position: absolute;
+      right: -2px;
+      top: -1px;
+      min-width: 18px;
+      height: 18px;
+      padding: 0 5px;
+      border-radius: 999px;
+      background: linear-gradient(90deg,#ff8c3a,#ff5a2a);
+      color: #fff;
+      font-size: 10px;
+      font-weight: 700;
+      line-height: 18px;
+      text-align: center;
+      box-shadow: 0 2px 8px rgba(255,105,60,.35);
+      pointer-events: none;
+    }
     .input-box {
       flex: 1;
       background: rgba(0,0,0,.3); border-radius: 22px;
-      padding: 10px 14px;
-      display: flex; align-items: center; justify-content: space-between;
+      min-height: 40px;
+      padding: 4px 6px 4px 12px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .chat-inline-input {
+      flex: 1;
+      min-width: 0;
+      border: none;
+      outline: none;
+      background: transparent;
+      color: #fff;
+      font-size: 15px;
+      font-weight: 500;
+    }
+    .chat-inline-input::placeholder {
+      color: rgba(255,255,255,.88);
+    }
+    .chat-send-btn {
+      border: none;
+      background: linear-gradient(90deg,#ff8c3a,#ff5a2a);
+      color: #fff;
+      font-size: 13px;
+      font-weight: 700;
+      border-radius: 16px;
+      min-width: 52px;
+      height: 30px;
+      padding: 0 12px;
+      flex-shrink: 0;
       cursor: pointer;
     }
-    .input-placeholder { color: #fff; font-size: 16px; font-weight: 500; }
-    .input-emoji { font-size: 22px; }
+    .chat-send-btn:active {
+      opacity: .88;
+      transform: scale(.98);
+    }
     .cart-btn {
       position: relative;
-      width: 46px; height: 46px;
+      width: 42px; height: 42px;
       display: flex; align-items: center; justify-content: center;
       cursor: pointer; flex-shrink: 0;
     }
-    .cart-btn img { width: 42px; height: 42px; display: block; }
+    .cart-btn img { width: 38px; height: 38px; display: block; }
+
+    .room-switch-mask {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.45);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .2s ease;
+      z-index: 32;
+    }
+    .room-switch-mask.show {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .room-switch-sheet {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 33;
+      transform: translateY(110%);
+      transition: transform .25s ease;
+      background: linear-gradient(180deg, rgba(255,255,255,.98), rgba(247,245,240,.98));
+      border-radius: 22px 22px 0 0;
+      padding: 10px 16px calc(22px + env(safe-area-inset-bottom, 0));
+      box-shadow: 0 -12px 30px rgba(0,0,0,.22);
+    }
+    .room-switch-sheet.show {
+      transform: translateY(0);
+    }
+    .room-switch-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+      color: #222;
+    }
+    .room-switch-title {
+      font-size: 17px;
+      font-weight: 700;
+    }
+    .room-switch-close {
+      width: 28px;
+      height: 28px;
+      border: none;
+      border-radius: 50%;
+      background: #f0ece5;
+      color: #666;
+      font-size: 18px;
+      cursor: pointer;
+    }
+    .room-switch-list {
+      display: grid;
+      gap: 10px;
+    }
+    .room-switch-card {
+      border: 1px solid rgba(238, 187, 140, .55);
+      border-radius: 16px;
+      padding: 14px;
+      background: linear-gradient(135deg, #fff9f0, #fff);
+      box-shadow: 0 8px 18px rgba(191, 145, 87, .08);
+      cursor: pointer;
+    }
+    .room-switch-card.active {
+      border-color: #ee7b2d;
+      box-shadow: 0 10px 22px rgba(238, 123, 45, .16);
+    }
+    .room-switch-card-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+    .room-switch-card-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: #232323;
+    }
+    .room-switch-card-subtitle {
+      margin-top: 4px;
+      color: #8b6b45;
+      font-size: 12px;
+    }
+    .room-switch-card-badge {
+      flex-shrink: 0;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 58px;
+      height: 24px;
+      padding: 0 10px;
+      border-radius: 999px;
+      background: rgba(238, 123, 45, .12);
+      color: #d46218;
+      font-size: 11px;
+      font-weight: 700;
+    }
+    .room-switch-card-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      color: #6f6b64;
+      font-size: 12px;
+    }
 
     /* ── 飘心动画 ── */
     @keyframes floatHeart {
@@ -703,13 +1021,14 @@
     <div class="top-row1">
       <div class="back-btn">‹</div>
       <div class="anchor-capsule">
-        <div class="anchor-avatar"></div>
+        <div class="anchor-avatar" id="viewer-anchor-avatar"></div>
         <div class="anchor-info">
-          <div class="anchor-name">冷丰特选</div>
-          <div class="anchor-viewers"><span id="viewer-count">117</span>人正在观看</div>
+          <div class="anchor-name" id="viewer-anchor-name">冷丰特选</div>
+          <div class="anchor-viewers"><span id="viewer-count">--</span>人正在观看</div>
         </div>
       </div>
       <div class="top-actions">
+        <button class="room-switch-btn" type="button" onclick="showRoomSwitch()">切直播</button>
         <button class="follow-btn" id="follow-btn" onclick="toggleFollow()">+ 关注</button>
         <div class="share-area complain-area" onclick="alert('投诉已提交，我们会尽快处理')">
           <span class="share-icon complain-icon">⚠️</span>
@@ -718,12 +1037,19 @@
       </div>
     </div>
     <div class="top-row2">
-      <div style="flex:1"></div>
+      <div class="room-pill" onclick="showRoomSwitch()">
+        <span class="room-pill-label">当前直播</span>
+        <span class="room-pill-text" id="active-room-pill">车厘子专场</span>
+      </div>
       <div class="watched-badge">
         <div class="watched-label">已看</div>
         <div class="watched-time" id="watch-time">00:00</div>
         <div class="watched-score">得100积分</div>
       </div>
+    </div>
+    <div class="room-notice" id="room-notice" hidden>
+      <span class="room-notice-label">公告</span>
+      <span class="room-notice-text" id="room-notice-text"></span>
     </div>
   </div>
 
@@ -750,40 +1076,30 @@
   <!-- 弹幕 + 商品卡片 -->
   <div class="bottom-content">
     <div class="danmu-col" id="danmu-area">
-      <div class="danmu-item">
-        <div class="danmu-avatar">😊</div>
-        <span class="danmu-name">宁静致远：</span><span class="danmu-text">111</span>
-      </div>
-      <div class="danmu-item">
-        <div class="danmu-avatar">😄</div>
-        <span class="danmu-name">心平气和：</span><span class="danmu-text">111</span>
-      </div>
-      <div class="danmu-item">
-        <div class="danmu-avatar">🙂</div>
-        <span class="danmu-name">宁静致远：</span><span class="danmu-text">主播这个商品有没有运费险，坏果退换吗</span>
-      </div>
-      <div class="danmu-item">
-        <div class="danmu-avatar">😁</div>
-        <span class="danmu-name">宁静致远：</span><span class="danmu-text">来了</span>
+      <div class="danmu-item danmu-item--system danmu-item--wide" data-message-type="system">
+        <div class="danmu-avatar">📡</div>
+        <div class="danmu-content">
+          <span class="danmu-name">系统：</span><span class="danmu-text">正在连接直播群...</span>
+        </div>
       </div>
     </div>
-    <div class="goods-card" onclick="showDrawer()">
+    <div class="goods-card" onclick="showDrawer('play')">
       <div class="goods-img-wrap">
         <div class="goods-tag">
           <span class="goods-tag-icon">📊</span>
-          <span class="goods-tag-text">讲解中</span>
+          <span class="goods-tag-text" id="featured-goods-tag">讲解中</span>
         </div>
       </div>
-      <div class="goods-name">冷丰优选3J智利车厘子 鲜…</div>
+      <div class="goods-name" id="featured-goods-name">冷丰优选3J智利车厘子 鲜…</div>
       <div class="goods-bottom">
-        <div class="goods-price-wrap">
-          <span class="goods-price" style="color:#fff">
+        <div class="goods-price-wrap" id="featured-goods-price-wrap">
+          <span class="goods-price" id="featured-goods-price" style="color:#fff">
             <span class="unit">¥</span>
             <span class="integer">128</span>
             <span class="decimal">.8</span>
           </span>
         </div>
-        <div class="goods-buy-btn" onclick="showBuyModal({emoji:'🍒',price:'128.8',name:'冷丰优选3J智利车厘子'})">抢</div>
+        <div class="goods-buy-btn" id="featured-goods-buy-btn" onclick="showFeaturedBuy(event)">抢</div>
       </div>
     </div>
   </div>
@@ -792,14 +1108,32 @@
   <div class="bottom-bar">
     <div class="like-btn-wrap" onclick="sendLike()">
       <img src="images/composer-like.png" alt="赞">
+      <span class="like-count-badge" id="viewer-like-count">0</span>
     </div>
-    <div class="input-box" onclick="showDrawer()">
-      <span class="input-placeholder">说点什么…</span>
-      <span class="input-emoji">😊</span>
+    <div class="input-box">
+      <input
+        id="chat-inline-input"
+        class="chat-inline-input"
+        type="text"
+        maxlength="40"
+        placeholder="说点什么..."
+        aria-label="发送弹幕"
+      />
+      <button type="button" class="chat-send-btn" onclick="sendViewerMessage('inline')">发送</button>
     </div>
     <div class="cart-btn" onclick="showGoodsPanel()">
       <img src="images/composer-cart.png" alt="购物车">
     </div>
+  </div>
+
+  <div class="room-switch-mask" id="room-switch-mask" onclick="hideRoomSwitch()"></div>
+  <div class="room-switch-sheet" id="room-switch-sheet">
+    <div class="drawer-handle"></div>
+    <div class="room-switch-head">
+      <div class="room-switch-title">切换直播间</div>
+      <button type="button" class="room-switch-close" onclick="hideRoomSwitch()">×</button>
+    </div>
+    <div class="room-switch-list" id="room-switch-list"></div>
   </div>
 
   <!-- 商品面板 -->
@@ -914,7 +1248,7 @@
   <div class="drawer-mask" id="drawer-mask" onclick="hideDrawer()"></div>
   <div class="drawer" id="drawer">
     <div class="drawer-handle"></div>
-    <div class="drawer-title">播放设置</div>
+    <div class="drawer-title">直播设置</div>
     <div class="drawer-field">
       <label>播放地址</label>
       <input id="pull-url" type="url" inputmode="url"
@@ -926,6 +1260,15 @@
       <button class="btn btn-primary" onclick="startPlay()">▶ 开始播放</button>
       <button class="btn btn-secondary" onclick="stopPlay()">■ 停止</button>
     </div>
+    <div class="drawer-field" style="margin-top:14px;">
+      <label>发送弹幕</label>
+      <input id="chat-text" type="text" maxlength="40" placeholder="输入想发给直播间的话" />
+      <div class="hint" id="im-status">IM 准备连接中...</div>
+    </div>
+    <div class="drawer-btns">
+      <button class="btn btn-primary" onclick="sendViewerMessage()">发送弹幕</button>
+      <button class="btn btn-secondary" onclick="refreshViewerCount()">刷新人数</button>
+    </div>
     <div class="log-box" id="pull-log">
       <div class="info">进入页面将自动播放默认线路；也可在此修改地址后重新播放</div>
     </div>
@@ -934,8 +1277,43 @@
 </div><!-- /live-wrap -->
 
 
+<script src="vendor/tencentcloud-chat.js"></script>
+<script src="live-im-config.js"></script>
+<script src="live-im.js"></script>
 <script>
-// ── 日志 ─────────────────────────────────────
+const roomCatalog = window.LIVE_IM_CONFIG && typeof window.LIVE_IM_CONFIG.getRoomList === 'function'
+  ? window.LIVE_IM_CONFIG.getRoomList()
+  : [];
+
+let viewerIM = null;
+let viewerLikeTotal = 0;
+let player = null;
+let followed = false;
+let watchSeconds = 0;
+let t1 = 345;
+let t2 = 345;
+let lbJoined = false;
+let lbTimerSec = 247;
+let lbTimerInterval = null;
+let goodsData = [];
+let currentTab = '全部';
+let currentQty = 1;
+let currentFeaturedGoods = null;
+
+const viewerRole = getViewerRole();
+let activeRoomId = window.LIVE_IM_CONFIG && typeof window.LIVE_IM_CONFIG.getRoomIdFromLocation === 'function'
+  ? window.LIVE_IM_CONFIG.getRoomIdFromLocation(window.location.search)
+  : 'orchard';
+let activeRoom = getRoomConfig(activeRoomId);
+
+const lbPrizes = [
+  { type:'win',  icon:'🥩', title:'精选金钱牛腱子肉 1份',  sub:'精选金钱牛腱子肉', expire:'有效期：2026-12-31', primary:'立即领取', secondary:'查看中奖名单', showCard:true },
+  { type:'win',  icon:'🪙', title:'积分100分',              sub:'恭喜获得积分奖励', expire:'积分永久有效', primary:'去查看积分', secondary:'查看中奖名单', showCard:true },
+  { type:'win',  icon:'🎫', title:'平台通用代金券 ¥10',    sub:'代金券已发放至账户', expire:'有效期至 2026-03-31', primary:'立即领取', secondary:'查看中奖名单', showCard:true },
+  { type:'miss', icon:'🍀', title:'没有抽中福袋',           sub:'没有一个好运气\n查看中奖名单', expire:'', primary:'', secondary:'我知道了', showCard:false },
+  { type:'near', icon:'😮', title:'1位差点追众',            sub:'差一点就追众了\n精选金钱牛腱子肉 1份', expire:'', primary:'', secondary:'查看中奖名单', showCard:false },
+];
+
 function log(msg, type = 'info') {
   const box = document.getElementById('pull-log');
   const el = document.createElement('div');
@@ -945,18 +1323,97 @@ function log(msg, type = 'info') {
   box.scrollTop = box.scrollHeight;
 }
 
-// ── 抽屉 ─────────────────────────────────────
-function showDrawer() {
+function getRoomConfig(roomId) {
+  if (window.LIVE_IM_CONFIG && typeof window.LIVE_IM_CONFIG.getRoomConfig === 'function') {
+    return window.LIVE_IM_CONFIG.getRoomConfig(roomId);
+  }
+  return window.LIVE_IM_CONFIG || {};
+}
+
+function getViewerRole() {
+  const params = new URLSearchParams(window.location.search);
+  const role = params.get('role');
+  const roles = window.LIVE_IM_CONFIG && window.LIVE_IM_CONFIG.roles;
+  if (role && roles && roles[role]) {
+    return role;
+  }
+  return 'viewer';
+}
+
+function cloneGoods(list) {
+  return (list || []).map(item => ({ ...item }));
+}
+
+function syncRoomQuery(roomId) {
+  const params = new URLSearchParams(window.location.search);
+  params.set('room', roomId);
+  const query = params.toString();
+  history.replaceState(null, '', `${window.location.pathname}${query ? `?${query}` : ''}`);
+}
+
+function formatPriceNode(price) {
+  const value = Number.parseFloat(price || '0');
+  const safeValue = Number.isFinite(value) ? value.toFixed(1) : '0.0';
+  const parts = safeValue.split('.');
+  return `<span class="unit">¥</span><span class="integer">${parts[0]}</span><span class="decimal">.${parts[1]}</span>`;
+}
+
+function updateWatchTime() {
+  const m = String(Math.floor(watchSeconds / 60)).padStart(2, '0');
+  const s = String(watchSeconds % 60).padStart(2, '0');
+  document.getElementById('watch-time').textContent = `${m}:${s}`;
+}
+
+function updateActionTimers() {
+  const format = value => `${String(Math.floor(value / 60)).padStart(2, '0')}:${String(value % 60).padStart(2, '0')}`;
+  document.getElementById('timer1').textContent = format(t1);
+  document.getElementById('timer2').textContent = format(t2);
+}
+
+function showDrawer(mode = 'play') {
   document.getElementById('drawer-mask').classList.add('show');
   document.getElementById('drawer').classList.add('show');
+  if (mode === 'chat') {
+    requestAnimationFrame(() => {
+      const input = document.getElementById('chat-text');
+      if (input) input.focus();
+    });
+  }
 }
+
 function hideDrawer() {
   document.getElementById('drawer-mask').classList.remove('show');
   document.getElementById('drawer').classList.remove('show');
 }
 
-// ── 关注 ─────────────────────────────────────
-let followed = false;
+function showRoomSwitch() {
+  document.getElementById('room-switch-mask').classList.add('show');
+  document.getElementById('room-switch-sheet').classList.add('show');
+}
+
+function hideRoomSwitch() {
+  document.getElementById('room-switch-mask').classList.remove('show');
+  document.getElementById('room-switch-sheet').classList.remove('show');
+}
+
+function renderRoomSwitchList() {
+  document.getElementById('room-switch-list').innerHTML = roomCatalog.map(room => `
+    <div class="room-switch-card ${room.roomId === activeRoomId ? 'active' : ''}" onclick="switchViewerRoom('${room.roomId}')">
+      <div class="room-switch-card-top">
+        <div>
+          <div class="room-switch-card-title">${room.title}</div>
+          <div class="room-switch-card-subtitle">${room.subtitle || ''}</div>
+        </div>
+        <div class="room-switch-card-badge">${room.roomId === activeRoomId ? '当前直播' : (room.hasPullUrl ? '已配线路' : '待填线路')}</div>
+      </div>
+      <div class="room-switch-card-meta">
+        <span>主播：${room.anchorDisplayName || '待定'}</span>
+        <span>${room.hasPullUrl ? '可直接播放' : '需补播放地址'}</span>
+      </div>
+    </div>
+  `).join('');
+}
+
 function toggleFollow() {
   followed = !followed;
   const btn = document.getElementById('follow-btn');
@@ -964,79 +1421,339 @@ function toggleFollow() {
   btn.classList.toggle('followed', followed);
 }
 
-// ── 观看时长计时 ──────────────────────────────
-let watchSeconds = 0;
-setInterval(() => {
-  watchSeconds++;
-  const m = String(Math.floor(watchSeconds / 60)).padStart(2, '0');
-  const s = String(watchSeconds % 60).padStart(2, '0');
-  document.getElementById('watch-time').textContent = `${m}:${s}`;
-}, 1000);
+function resetFollowState() {
+  followed = false;
+  const btn = document.getElementById('follow-btn');
+  btn.textContent = '+ 关注';
+  btn.classList.remove('followed');
+}
 
-// ── 倒计时 ────────────────────────────────────
-let t1 = 345, t2 = 345;
-setInterval(() => {
-  if (t1 > 0) t1--;
-  if (t2 > 0) t2--;
-  const fmt = t => `${String(Math.floor(t/60)).padStart(2,'0')}:${String(t%60).padStart(2,'0')}`;
-  document.getElementById('timer1').textContent = fmt(t1);
-  document.getElementById('timer2').textContent = fmt(t2);
-}, 1000);
-
-// ── 点赞飘心 ─────────────────────────────────
-function sendLike() {
+function burstLikeHeart() {
   const emojis = ['❤️','💕','💗','💖','🧡','💛'];
   const heart = document.createElement('div');
   heart.className = 'float-heart';
   heart.textContent = emojis[Math.floor(Math.random() * emojis.length)];
-  heart.style.left  = (30 + Math.random() * 60) + 'px';
+  heart.style.left = (30 + Math.random() * 60) + 'px';
   heart.style.bottom = '80px';
   document.body.appendChild(heart);
   setTimeout(() => heart.remove(), 1600);
 }
 
-// ── 弹幕模拟 ─────────────────────────────────
-const avatars = ['😊','😄','🙂','😁','🥰','😎','😍'];
-const names   = ['宁静致远','心平气和','买买买','冰冰','大壮','晓晓','乐乐'];
-const msgs    = ['这个多少钱？','好看！','求链接！','已下单✅','主播加油！','哪里买？','好便宜！','有运费险吗？','坏果退吗？'];
-let danmuTimer = null;
+function createBadge(className, text) {
+  const el = document.createElement('span');
+  el.className = className;
+  el.textContent = text;
+  return el;
+}
 
-function addDanmu(avatar, name, msg) {
+function updateViewerLikeCount(delta, reset = false) {
+  viewerLikeTotal = reset ? 0 : Math.max(0, viewerLikeTotal + (delta || 0));
+  document.getElementById('viewer-like-count').textContent = viewerLikeTotal > 99 ? '99+' : String(viewerLikeTotal);
+}
+
+function refreshDanmuLayout() {
   const area = document.getElementById('danmu-area');
-  const el = document.createElement('div');
-  el.className = 'danmu-item';
-  el.innerHTML = `<div class="danmu-avatar">${avatar}</div><span class="danmu-name">${name}：</span><span class="danmu-text">${msg}</span>`;
-  area.appendChild(el);
+  const items = Array.from(area.children);
+  const safeCount = items.length >= 5 ? 3 : 2;
+
+  items.forEach((item, index) => {
+    const distanceFromBottom = items.length - index - 1;
+    const useCardSafeLane = items.length >= 3 && distanceFromBottom < safeCount;
+
+    item.classList.remove('danmu-item--wide', 'danmu-item--card-safe', 'danmu-item--system');
+    item.classList.add(useCardSafeLane ? 'danmu-item--card-safe' : 'danmu-item--wide');
+
+    if (item.dataset.messageType === 'system') {
+      item.classList.add('danmu-item--system');
+    }
+  });
+}
+
+function resetDanmuArea(message = '正在连接直播群...') {
+  const area = document.getElementById('danmu-area');
+  area.innerHTML = `
+    <div class="danmu-item danmu-item--system danmu-item--wide" data-message-type="system">
+      <div class="danmu-avatar">📡</div>
+      <div class="danmu-content">
+        <span class="danmu-name">系统：</span><span class="danmu-text">${message}</span>
+      </div>
+    </div>
+  `;
+  refreshDanmuLayout();
+}
+
+function addDanmu(avatar, name, msg, profile = null) {
+  const area = document.getElementById('danmu-area');
+  const item = document.createElement('div');
+  const avatarEl = document.createElement('div');
+  const contentEl = document.createElement('div');
+  const metaEl = document.createElement('div');
+  const nameEl = document.createElement('span');
+  const textEl = document.createElement('span');
+
+  item.className = 'danmu-item';
+  if ((profile && profile.messageType === 'system') || name === '系统') {
+    item.dataset.messageType = 'system';
+  }
+  avatarEl.className = 'danmu-avatar';
+  avatarEl.textContent = avatar;
+  contentEl.className = 'danmu-content';
+  metaEl.className = 'danmu-meta';
+  nameEl.className = 'danmu-name';
+  nameEl.textContent = `${name}：`;
+  textEl.className = 'danmu-text';
+  textEl.textContent = msg;
+
+  if (profile && profile.roleLabel) {
+    metaEl.appendChild(createBadge(`danmu-role-badge role-${profile.roleTone || profile.roleKey || 'viewer'}`, profile.roleLabel));
+  }
+  if (profile && profile.levelLabel) {
+    metaEl.appendChild(createBadge('danmu-level-badge', profile.levelLabel));
+  }
+  metaEl.appendChild(nameEl);
+
+  item.appendChild(avatarEl);
+  contentEl.appendChild(metaEl);
+  contentEl.appendChild(textEl);
+  item.appendChild(contentEl);
+  area.appendChild(item);
   if (area.children.length > 6) area.removeChild(area.children[0]);
-  // 随机涨人数
-  const base = 100 + Math.floor(Math.random() * 30);
-  document.getElementById('viewer-count').textContent = base;
+  refreshDanmuLayout();
 }
 
-function startDanmu() {
-  danmuTimer = setInterval(() => {
-    const a = avatars[Math.floor(Math.random() * avatars.length)];
-    const n = names[Math.floor(Math.random() * names.length)];
-    const m = msgs[Math.floor(Math.random() * msgs.length)];
-    addDanmu(a, n, m);
-  }, 2500);
+function setImStatus(text) {
+  const el = document.getElementById('im-status');
+  if (el) el.textContent = text;
 }
-function stopDanmu() { clearInterval(danmuTimer); danmuTimer = null; }
 
-// ── 播放器 ───────────────────────────────────
-let player = null;
+function setViewerAnnouncement(text) {
+  const notice = document.getElementById('room-notice');
+  const textEl = document.getElementById('room-notice-text');
+  const value = String(text || '').trim();
 
-function startPlay() {
+  if (!notice || !textEl) return;
+  if (!value) {
+    notice.hidden = true;
+    textEl.textContent = '';
+    return;
+  }
+
+  textEl.textContent = value;
+  notice.hidden = false;
+}
+
+function applyFeaturedGoods() {
+  currentFeaturedGoods = goodsData.find(item => item.onAir) || goodsData[0] || null;
+  const tagEl = document.getElementById('featured-goods-tag');
+  const nameEl = document.getElementById('featured-goods-name');
+  const priceEl = document.getElementById('featured-goods-price');
+  const buyBtn = document.getElementById('featured-goods-buy-btn');
+
+  if (!currentFeaturedGoods) {
+    tagEl.textContent = '待上架';
+    nameEl.textContent = '当前房间暂无商品';
+    priceEl.innerHTML = '<span class="unit">¥</span><span class="integer">0</span><span class="decimal">.0</span>';
+    buyBtn.textContent = '待上架';
+    return;
+  }
+
+  tagEl.textContent = currentFeaturedGoods.onAir ? '讲解中' : '主推款';
+  nameEl.textContent = currentFeaturedGoods.name;
+  priceEl.innerHTML = formatPriceNode(currentFeaturedGoods.price);
+  buyBtn.textContent = currentFeaturedGoods.soldOut ? '已售磬' : '抢';
+}
+
+function applyRoomConfig(roomId, options = {}) {
+  const replaceUrl = options.replaceUrl !== false;
+  activeRoomId = roomId;
+  activeRoom = getRoomConfig(roomId);
+  goodsData = cloneGoods(activeRoom.goods);
+  currentTab = '全部';
+
+  document.title = `${activeRoom.title} — 观众`;
+  document.getElementById('viewer-anchor-name').textContent = activeRoom.title;
+  document.getElementById('active-room-pill').textContent = activeRoom.subtitle || activeRoom.title;
+  document.getElementById('pull-url').value = activeRoom.pullUrl || '';
+  document.getElementById('viewer-count').textContent = activeRoom.defaultViewerCount || '--';
+  document.getElementById('chat-inline-input').placeholder = `在 ${activeRoom.title} 说点什么...`;
+  document.getElementById('chat-text').placeholder = `输入想发给${activeRoom.title}的话`;
+  document.getElementById('goods-search').value = '';
+  document.querySelectorAll('.goods-tab').forEach(tab => tab.classList.remove('active'));
+  if (document.querySelector('.goods-tab')) {
+    document.querySelector('.goods-tab').classList.add('active');
+  }
+
+  watchSeconds = 0;
+  updateWatchTime();
+  updateViewerLikeCount(0, true);
+  resetFollowState();
+  setViewerAnnouncement(activeRoom.announcement || '');
+
+  t1 = (activeRoom.timers && activeRoom.timers.claim) || 345;
+  t2 = (activeRoom.timers && activeRoom.timers.checkin) || 345;
+  lbTimerSec = (activeRoom.timers && activeRoom.timers.luckyBag) || 247;
+  lbJoined = false;
+  updateActionTimers();
+  document.getElementById('lucky-bag-timer').textContent = `${String(Math.floor(lbTimerSec / 60)).padStart(2, '0')}:${String(lbTimerSec % 60).padStart(2, '0')}`;
+  document.getElementById('lb-detail-cd').textContent = `${String(Math.floor(lbTimerSec / 60)).padStart(2, '0')}:${String(lbTimerSec % 60).padStart(2, '0')}`;
+  document.getElementById('lb-join-btn').textContent = '一键参与抽奖';
+  document.getElementById('lb-join-btn').classList.remove('joined');
+
+  applyFeaturedGoods();
+  renderGoods(goodsData);
+  renderRoomSwitchList();
+
+  if (replaceUrl) {
+    syncRoomQuery(activeRoomId);
+  }
+}
+
+async function destroyViewerIM() {
+  if (!viewerIM) return;
+  if (typeof viewerIM.destroy === 'function') {
+    await viewerIM.destroy();
+  }
+  viewerIM = null;
+}
+
+async function initViewerIM() {
+  try {
+    setImStatus('IM 连接中...');
+    viewerIM = LiveIM.createClient(viewerRole, {
+      log,
+      onTextMessage(message) {
+        addDanmu(message.avatarEmoji, message.nick, message.text, message.profile);
+      },
+      onLike(message) {
+        updateViewerLikeCount(message.count);
+        addDanmu('💖', message.nick, `点赞了直播间 x${message.count}`, message.profile);
+        const burstCount = message.isSelf ? Math.max(0, Math.min(message.count, 6) - 1) : Math.min(message.count, 6);
+        for (let index = 0; index < burstCount; index += 1) {
+          setTimeout(() => burstLikeHeart(), index * 120);
+        }
+      },
+      onJoinNotice(message) {
+        addDanmu('📣', '系统', message.text);
+      },
+      onAnnouncement(message) {
+        setViewerAnnouncement(message.text);
+        log(`直播公告已更新：${message.text}`, 'info');
+      },
+      onOnlineCount(count) {
+        document.getElementById('viewer-count').textContent = count;
+      },
+      onJoined() {
+        setImStatus(`IM 已加入直播群（${viewerRole}）`);
+      }
+    }, {
+      roomId: activeRoomId
+    });
+    await viewerIM.connect();
+    setImStatus(`IM 已连接，可直接发送弹幕（${viewerRole}）`);
+  } catch (error) {
+    setImStatus('IM 连接失败，请检查测试账号');
+    log(`IM 初始化失败：${LiveIM.normalizeError(error)}`, 'err');
+  }
+}
+
+async function sendViewerMessage(source = 'drawer') {
+  const input = document.getElementById(source === 'inline' ? 'chat-inline-input' : 'chat-text');
+  const text = input.value.trim();
+  if (!text) {
+    if (source !== 'inline') {
+      alert('请先输入弹幕内容');
+    }
+    input.focus();
+    return;
+  }
+  if (!viewerIM) {
+    alert('IM 还没连接好，请稍后重试');
+    return;
+  }
+
+  try {
+    await viewerIM.sendText(text);
+    input.value = '';
+    if (source !== 'inline') {
+      hideDrawer();
+    }
+    log('弹幕发送成功 ✓', 'ok');
+  } catch (error) {
+    log(`弹幕发送失败：${LiveIM.normalizeError(error)}`, 'err');
+  }
+}
+
+async function refreshViewerCount() {
+  if (!viewerIM) return;
+  try {
+    const count = await viewerIM.refreshOnlineCount();
+    if (typeof count === 'number') {
+      document.getElementById('viewer-count').textContent = count;
+      log(`在线人数已刷新：${count}`, 'info');
+    }
+  } catch (error) {
+    log(`刷新人数失败：${LiveIM.normalizeError(error)}`, 'warn');
+  }
+}
+
+async function sendLike() {
+  burstLikeHeart();
+  if (!viewerIM) {
+    log('点赞已展示，本地 IM 还在连接中', 'warn');
+    return;
+  }
+
+  try {
+    await viewerIM.sendLike(1);
+  } catch (error) {
+    log(`点赞同步失败：${LiveIM.normalizeError(error)}`, 'warn');
+  }
+}
+
+async function switchViewerRoom(roomId) {
+  if (!roomId || roomId === activeRoomId) {
+    hideRoomSwitch();
+    return;
+  }
+
+  hideRoomSwitch();
+  hideDrawer();
+  hideGoodsPanel();
+  hideLbDetailForce();
+  hideLbResult(false);
+  hideBuyModal();
+  stopPlay(true);
+  resetDanmuArea('正在切换直播间...');
+  await destroyViewerIM();
+  applyRoomConfig(roomId);
+  await initViewerIM();
+  requestAnimationFrame(() => {
+    startPlay({ quiet: true, preserveLog: true });
+  });
+  log(`已切换到 ${activeRoom.title}`, 'ok');
+}
+
+function startPlay(options = {}) {
+  const quiet = !!options.quiet;
+  const preserveLog = !!options.preserveLog;
   const url = document.getElementById('pull-url').value.trim();
-  if (!url) { alert('请填写播放地址'); return; }
+  if (!url) {
+    if (!quiet) {
+      alert('请填写播放地址');
+    }
+    log('当前房间暂未配置播放地址，可在设置中手动填写', 'warn');
+    return;
+  }
 
-  stopPlay();
+  stopPlay(true);
 
   const wrap = document.getElementById('player-wrap');
   wrap.innerHTML = '<video id="player-container" preload="auto" playsinline webkit-playsinline style="width:100%;height:100%;object-fit:cover;display:block;background:#000;position:absolute;inset:0;"></video>';
 
   try {
-    log(`初始化播放器：${url}`, 'info');
+    if (!preserveLog) {
+      log(`初始化播放器：${url}`, 'info');
+    }
 
     player = TCPlayer('player-container', {
       sources: [{ src: url }],
@@ -1050,39 +1767,24 @@ function startPlay() {
     player.on('playing', () => {
       log('播放中 ✓', 'ok');
       hideDrawer();
-      startDanmu();
     });
     player.on('waiting', () => log('缓冲中...', 'info'));
     player.on('error', () => log('播放出错，检查地址或主播是否在线', 'err'));
-    player.on('ended', () => { log('直播已结束', 'warn'); stopDanmu(); });
-
-  } catch(e) {
-    log(`初始化失败：${e.message}`, 'err');
+    player.on('ended', () => { log('直播已结束', 'warn'); });
+  } catch (error) {
+    log(`初始化失败：${error.message}`, 'err');
   }
 }
 
-function stopPlay() {
+function stopPlay(silent = false) {
   if (player) {
-    try { player.pause(); player.dispose(); } catch(e) {}
+    try { player.pause(); player.dispose(); } catch (error) {}
     player = null;
-    log('已停止播放', 'info');
+    if (!silent) {
+      log('已停止播放', 'info');
+    }
   }
-  stopDanmu();
 }
-
-// ── 福袋逻辑 ─────────────────────────────────
-let lbJoined = false;
-let lbTimerSec = 247; // 4分07秒
-let lbTimerInterval = null;
-
-// 奖品配置（随机一个）
-const lbPrizes = [
-  { type:'win',  icon:'🥩', title:'精选金钱牛腱子肉 1份',  sub:'精选金钱牛腱子肉', expire:'有效期：2026-12-31', primary:'立即领取', secondary:'查看中奖名单', showCard:true },
-  { type:'win',  icon:'🪙', title:'积分100分',              sub:'恭喜获得积分奖励', expire:'积分永久有效', primary:'去查看积分', secondary:'查看中奖名单', showCard:true },
-  { type:'win',  icon:'🎫', title:'平台通用代金券 ¥10',    sub:'代金券已发放至账户', expire:'有效期至 2026-03-31', primary:'立即领取', secondary:'查看中奖名单', showCard:true },
-  { type:'miss', icon:'🍀', title:'没有抽中福袋',           sub:'没有一个好运气\n查看中奖名单', expire:'', primary:'', secondary:'我知道了', showCard:false },
-  { type:'near', icon:'😮', title:'1位差点追众',            sub:'差一点就追众了\n精选金钱牛腱子肉 1份', expire:'', primary:'', secondary:'查看中奖名单', showCard:false },
-];
 
 function startLbCountdown() {
   if (lbTimerInterval) return;
@@ -1091,14 +1793,13 @@ function startLbCountdown() {
     const mm = String(Math.floor(lbTimerSec / 60)).padStart(2,'0');
     const ss = String(lbTimerSec % 60).padStart(2,'0');
     const txt = `${mm}:${ss}`;
-    const t1 = document.getElementById('lucky-bag-timer');
-    const t2 = document.getElementById('lb-detail-cd');
-    if (t1) t1.textContent = txt;
-    if (t2) t2.textContent = txt;
+    const luckyTimer = document.getElementById('lucky-bag-timer');
+    const detailTimer = document.getElementById('lb-detail-cd');
+    if (luckyTimer) luckyTimer.textContent = txt;
+    if (detailTimer) detailTimer.textContent = txt;
     if (lbTimerSec === 0) {
       clearInterval(lbTimerInterval);
       lbTimerInterval = null;
-      // 自动开奖
       if (lbJoined) setTimeout(showLbResult, 500);
     }
   }, 1000);
@@ -1115,10 +1816,12 @@ function showLuckyBagDetail() {
   }
   document.getElementById('lb-detail-mask').classList.add('show');
 }
+
 function hideLbDetail(e) {
   if (e && e.target !== document.getElementById('lb-detail-mask')) return;
   document.getElementById('lb-detail-mask').classList.remove('show');
 }
+
 function hideLbDetailForce() {
   document.getElementById('lb-detail-mask').classList.remove('show');
 }
@@ -1130,25 +1833,22 @@ function joinLuckyBag() {
   btn.textContent = '已参与，等待开奖 ✓';
   btn.classList.add('joined');
   startLbCountdown();
-  // 3秒后关闭弹窗，给用户反馈
   setTimeout(hideLbDetailForce, 1200);
 }
 
 function showLbResult() {
-  // 随机一个奖品
   const prize = lbPrizes[Math.floor(Math.random() * lbPrizes.length)];
   const card = document.getElementById('lb-result-card');
   card.className = 'lb-result-card' + (prize.type !== 'win' ? ' no-win' : '');
 
-  document.getElementById('lb-res-icon').textContent   = prize.icon;
-  document.getElementById('lb-res-title').textContent  = prize.title;
-  document.getElementById('lb-res-sub').textContent    = prize.sub;
+  document.getElementById('lb-res-icon').textContent = prize.icon;
+  document.getElementById('lb-res-title').textContent = prize.title;
+  document.getElementById('lb-res-sub').textContent = prize.sub;
   document.getElementById('lb-prize-icon').textContent = prize.icon;
   document.getElementById('lb-prize-title').textContent = prize.sub;
   document.getElementById('lb-prize-expire').textContent = prize.expire;
 
-  const prizeCard = document.getElementById('lb-prize-card');
-  prizeCard.style.display = prize.showCard ? 'flex' : 'none';
+  document.getElementById('lb-prize-card').style.display = prize.showCard ? 'flex' : 'none';
 
   const primaryBtn = document.getElementById('lb-res-primary-btn');
   if (prize.primary) {
@@ -1158,44 +1858,25 @@ function showLbResult() {
     primaryBtn.style.display = 'none';
   }
   document.getElementById('lb-res-secondary-btn').textContent = prize.secondary;
-
-  const agreeEl = document.getElementById('lb-res-agree');
-  agreeEl.style.display = prize.showCard ? 'block' : 'none';
-
+  document.getElementById('lb-res-agree').style.display = prize.showCard ? 'block' : 'none';
   document.getElementById('lb-result-mask').classList.add('show');
 }
 
-function hideLbResult() {
+function hideLbResult(resetCurrentRound = true) {
   document.getElementById('lb-result-mask').classList.remove('show');
+  if (!resetCurrentRound) return;
   lbJoined = false;
-  lbTimerSec = 247;
-  const t1 = document.getElementById('lucky-bag-timer');
-  if (t1) t1.textContent = '04:07';
+  document.getElementById('lb-join-btn').textContent = '一键参与抽奖';
+  document.getElementById('lb-join-btn').classList.remove('joined');
 }
-
-// 页面加载后启动福袋倒计时（模拟主播开了一个福袋），并自动开始拉流播放
-window.addEventListener('DOMContentLoaded', () => {
-  startLbCountdown();
-  requestAnimationFrame(() => {
-    startPlay();
-  });
-});
-
-// ── 商品数据 ─────────────────────────────────
-const goodsData = [
-  { id:1, emoji:'🍒', name:'冷丰优选3J智利车厘子 鲜嫩多汁 坏了包退', tag:'坏了包退 三天内到货', price:'128.8', sold:'', category:'水果', onAir:true, soldOut:false },
-  { id:2, emoji:'🥩', name:'精选金钱牛腱子肉 软烂入味 已售188份', tag:'已售188', price:'96.8', sold:'188', category:'生鲜', onAir:false, soldOut:false },
-  { id:3, emoji:'🦀', name:'阳澄湖大闸蟹 膏脂肥美 坏了包退', tag:'坏了包退', price:'128.8', sold:'', category:'生鲜', onAir:false, soldOut:false },
-  { id:4, emoji:'🍊', name:'冷丰优选赣南脐橙 自然成熟 爆甜速发', tag:'坏果包退 三天内到货', price:'38.8', sold:'', category:'水果', onAir:false, soldOut:true },
-  { id:5, emoji:'🥜', name:'原味腰果仁 大颗粒饱满 每日坚果首选', tag:'坏了包退', price:'59.9', sold:'326', category:'坚果', onAir:false, soldOut:false },
-];
-
-let currentTab = '全部';
-let currentQty = 1;
 
 function renderGoods(list) {
   const el = document.getElementById('goods-list');
-  if (!list.length) { el.innerHTML = '<div style="text-align:center;padding:40px 0;color:#999;font-size:14px;">暂无商品</div>'; return; }
+  if (!list.length) {
+    el.innerHTML = '<div style="text-align:center;padding:40px 0;color:#999;font-size:14px;">暂无商品</div>';
+    return;
+  }
+
   el.innerHTML = list.map((g, i) => `
     <div class="goods-list-item">
       <div class="goods-list-rank ${i===0?'top1':i===1?'top2':i===2?'top3':''}">${i+1}</div>
@@ -1214,8 +1895,7 @@ function renderGoods(list) {
             <div class="goods-cart-icon">
               <img src="images/live-sheet-cart-red.png" alt="加购">
             </div>
-            <button class="goods-grab-btn ${g.soldOut?'sold-out':''}"
-              onclick="${g.soldOut?'':'showBuyModal({emoji:\''+g.emoji+'\',price:\''+g.price+'\',name:\''+g.name+'\'})'}">
+            <button class="goods-grab-btn ${g.soldOut?'sold-out':''}" onclick="showRoomGoodsBuy(${g.id})">
               ${g.soldOut?'已售磬':'去抢购'}
             </button>
           </div>
@@ -1242,14 +1922,26 @@ function switchTab(el, tab) {
 function showGoodsPanel() {
   document.getElementById('goods-panel-mask').classList.add('show');
   document.getElementById('goods-panel').classList.add('show');
-  renderGoods(goodsData);
+  renderGoods(currentTab === '全部' ? goodsData : goodsData.filter(g => g.category === currentTab));
 }
+
 function hideGoodsPanel() {
   document.getElementById('goods-panel-mask').classList.remove('show');
   document.getElementById('goods-panel').classList.remove('show');
 }
 
-// ── 抢购弹窗 ─────────────────────────────────
+function showFeaturedBuy(event) {
+  if (event) event.stopPropagation();
+  if (!currentFeaturedGoods || currentFeaturedGoods.soldOut) return;
+  showBuyModal(currentFeaturedGoods);
+}
+
+function showRoomGoodsBuy(goodsId) {
+  const goods = goodsData.find(item => item.id === goodsId);
+  if (!goods || goods.soldOut) return;
+  showBuyModal(goods);
+}
+
 function showBuyModal(goods) {
   currentQty = 1;
   document.getElementById('bm-thumb').textContent = goods.emoji;
@@ -1258,26 +1950,62 @@ function showBuyModal(goods) {
   document.getElementById('bm-qty').textContent = 1;
   document.getElementById('buy-modal-mask').classList.add('show');
 }
+
 function hideBuyModal(e) {
   if (e && e.target !== document.getElementById('buy-modal-mask')) return;
   document.getElementById('buy-modal-mask').classList.remove('show');
 }
+
 function selectSpec(el) {
   document.querySelectorAll('.spec-tag').forEach(t => t.classList.remove('active'));
   el.classList.add('active');
 }
+
 function changeQty(delta) {
   currentQty = Math.max(1, currentQty + delta);
   document.getElementById('bm-qty').textContent = currentQty;
 }
+
 function confirmBuy() {
   const price = document.getElementById('bm-price').textContent;
   const name = document.getElementById('bm-name').textContent;
-  const spec = document.querySelector('.spec-tag.active')?.textContent || '';
+  const spec = document.querySelector('.spec-tag.active') ? document.querySelector('.spec-tag.active').textContent : '';
   document.getElementById('buy-modal-mask').classList.remove('show');
-  // 实际项目对接下单接口
   setTimeout(() => alert(`✅ 下单成功！\n${name}\n规格：${spec}  数量：${currentQty}\n合计：¥${(parseFloat(price)*currentQty).toFixed(1)}`), 100);
 }
+
+setInterval(() => {
+  watchSeconds += 1;
+  updateWatchTime();
+}, 1000);
+
+setInterval(() => {
+  if (t1 > 0) t1 -= 1;
+  if (t2 > 0) t2 -= 1;
+  updateActionTimers();
+}, 1000);
+
+window.addEventListener('DOMContentLoaded', () => {
+  applyRoomConfig(activeRoomId);
+  startLbCountdown();
+  resetDanmuArea();
+  initViewerIM();
+  document.getElementById('chat-inline-input').addEventListener('keydown', event => {
+    if (event.key === 'Enter') {
+      event.preventDefault();
+      sendViewerMessage('inline');
+    }
+  });
+  document.getElementById('chat-text').addEventListener('keydown', event => {
+    if (event.key === 'Enter') {
+      event.preventDefault();
+      sendViewerMessage();
+    }
+  });
+  requestAnimationFrame(() => {
+    startPlay({ quiet: true });
+  });
+});
 </script>
 <div id="build-verify" class="build-verify" hidden aria-hidden="true"></div>
 <script>

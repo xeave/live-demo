@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>多直播 Demo 入口</title>
+  <style>
+    :root {
+      --bg: #f6f2eb;
+      --panel: rgba(255,255,255,.92);
+      --line: rgba(175,133,86,.18);
+      --text: #222;
+      --sub: #7d6a54;
+      --accent: #ee7b2d;
+      --accent-2: #ffb15c;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: -apple-system, 'PingFang SC', sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(255,214,156,.42), transparent 32%),
+        radial-gradient(circle at bottom right, rgba(255,182,134,.3), transparent 28%),
+        linear-gradient(180deg, #fffaf4, var(--bg));
+      padding: 28px 18px 40px;
+    }
+
+    .shell {
+      max-width: 1080px;
+      margin: 0 auto;
+    }
+
+    .hero {
+      background: linear-gradient(135deg, rgba(255,255,255,.95), rgba(255,245,230,.92));
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      padding: 28px;
+      box-shadow: 0 20px 40px rgba(141, 100, 52, .08);
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      height: 30px;
+      padding: 0 14px;
+      border-radius: 999px;
+      background: rgba(238,123,45,.1);
+      color: #cc651d;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    h1 {
+      margin: 14px 0 8px;
+      font-size: clamp(28px, 5vw, 42px);
+      line-height: 1.05;
+    }
+
+    .lead {
+      margin: 0;
+      color: var(--sub);
+      font-size: 15px;
+      line-height: 1.7;
+      max-width: 720px;
+    }
+
+    .tip-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 12px;
+      margin-top: 18px;
+    }
+
+    .tip {
+      padding: 14px 16px;
+      border-radius: 16px;
+      background: rgba(255,255,255,.74);
+      border: 1px solid rgba(205,170,129,.2);
+      color: #5e4a36;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .rooms {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+      margin-top: 20px;
+    }
+
+    .room-card {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      padding: 18px;
+      box-shadow: 0 16px 34px rgba(141, 100, 52, .08);
+    }
+
+    .room-top {
+      display: flex;
+      align-items: start;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .room-title {
+      font-size: 20px;
+      font-weight: 700;
+    }
+
+    .room-subtitle {
+      margin-top: 6px;
+      color: var(--sub);
+      font-size: 13px;
+    }
+
+    .badge {
+      flex-shrink: 0;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 68px;
+      height: 28px;
+      padding: 0 12px;
+      border-radius: 999px;
+      background: rgba(238,123,45,.1);
+      color: #cf6921;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .room-meta {
+      display: grid;
+      gap: 8px;
+      color: #584838;
+      font-size: 14px;
+      line-height: 1.5;
+      margin-bottom: 14px;
+    }
+
+    .actions {
+      display: grid;
+      gap: 10px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 42px;
+      padding: 0 14px;
+      border-radius: 14px;
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 14px;
+      border: 1px solid transparent;
+    }
+
+    .btn-primary {
+      background: linear-gradient(90deg, var(--accent-2), var(--accent));
+      color: #fff;
+      box-shadow: 0 10px 20px rgba(238,123,45,.22);
+    }
+
+    .btn-secondary {
+      background: rgba(255,255,255,.92);
+      border-color: rgba(205,170,129,.34);
+      color: #6d583f;
+    }
+
+    .inline-note {
+      margin-top: 10px;
+      color: var(--sub);
+      font-size: 12px;
+      line-height: 1.6;
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <section class="hero">
+      <div class="eyebrow">多直播 Demo</div>
+      <h1>一个入口页，直接演示多房间和观众切直播</h1>
+      <p class="lead">
+        这个页会根据 `live-im-config.js` 里的房间配置自动生成入口。建议演示时先打开一个或两个主播页，再打开观众页，在观众页右上角点“切直播”切换房间。
+      </p>
+      <div class="tip-grid">
+        <div class="tip">如果某个房间还没配真实推流或播放地址，页面会保留切房能力，但播放器只会提示“待填线路”。</div>
+        <div class="tip">主播页会自动带上推荐 `role` 参数，方便你用不同 IM 账号分别演示两个直播间。</div>
+        <div class="tip">同一时间想开两个主播页，最好用两个浏览器窗口或不同 Profile，避免浏览器权限和登录态互相影响。</div>
+      </div>
+    </section>
+
+    <section class="rooms" id="room-list"></section>
+  </div>
+
+  <script src="live-im-config.js"></script>
+  <script>
+    (function () {
+      var rooms = window.LIVE_IM_CONFIG && typeof window.LIVE_IM_CONFIG.getRoomList === 'function'
+        ? window.LIVE_IM_CONFIG.getRoomList()
+        : [];
+      var root = document.getElementById('room-list');
+
+      root.innerHTML = rooms.map(function (room) {
+        var anchorUrl = new URL('live-demo.html', window.location.href);
+        anchorUrl.searchParams.set('room', room.roomId);
+        if (room.recommendedAnchorRole) {
+          anchorUrl.searchParams.set('role', room.recommendedAnchorRole);
+        }
+
+        var viewerUrl = new URL('viewer.html', window.location.href);
+        viewerUrl.searchParams.set('room', room.roomId);
+
+        return `
+          <article class="room-card">
+            <div class="room-top">
+              <div>
+                <div class="room-title">${room.title}</div>
+                <div class="room-subtitle">${room.subtitle || ''}</div>
+              </div>
+              <div class="badge">${room.hasPullUrl ? '可播放' : '待配置'}</div>
+            </div>
+            <div class="room-meta">
+              <div>主播：${room.anchorDisplayName || '待定'}</div>
+              <div>推荐主播角色：${room.recommendedAnchorRole || 'anchor'}</div>
+              <div>播放地址：${room.hasPullUrl ? '已预置' : '需要手动填写'}</div>
+            </div>
+            <div class="actions">
+              <a class="btn btn-primary" href="${viewerUrl.toString()}">进入观众页</a>
+              <a class="btn btn-secondary" href="${anchorUrl.toString()}">进入主播控制台</a>
+            </div>
+            <div class="inline-note">
+              房间参数：<code>?room=${room.roomId}</code>
+            </div>
+          </article>
+        `;
+      }).join('');
+    })();
+  </script>
+</body>
+</html>
